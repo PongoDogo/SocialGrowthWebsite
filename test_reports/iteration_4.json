@@ -1,0 +1,58 @@
+{
+  "summary": "Iteration 4 full regression (backend + frontend) of the SocialGrowth site. Backend: 10/10 pytest cases pass (GET /api/, POST /api/contact 200 + persistence + formsubmit delivered=true, validation 422s, /api/contact/count increments, public GET /api/contact not exposed -> 405). Frontend: verified all 25 client cards render with decodable logos (25/25 naturalWidth>0), rebuilt logos (pantheon, xara, scorpios, tolis, ildesto, twisteast, yakuza) are visible and legible in zoomed screenshots, framed logos (guru, doncarlito, funkytokyo) are cleanly circle-masked with no outer frame, Instagram glyph renders as rect+circle+dot in card/hero/footer, whole-card anchors with correct href/target/rel for all 7 site-backed clients checked and DIV for all 9 site-less clients, 37/37 social hrefs exact-match, social link wins over card link (popup opened instagram.com/crats.gr while the page stayed put), 3 marquee rows with 1 reversed, per-card accent gradient bar + radial tint + accent hover border (verified rgb transition to #60d6ff), hover pauses only the hovered row, stat card 02 animates 0 -> 25+, EL/EN switch swaps copy and all English name variants, zero horizontal overflow at 1920/768/390 for hero/clients/results/services/process/contact, mobile card 158x200 with 21x21 social tap targets, mobile menu links scroll correctly, contact form E2E on desktop returns 200 and the count goes 13 -> 14 with success state shown. ONE real defect found: React logs a nested-anchor hydration error for every site-backed card.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Clients.js ClientCard / SocialRow",
+        "issue": "Invalid HTML: the social <a> elements are nested inside the card <a> (Shell = 'a' when c.site). React logs a console error on every affected card: 'In HTML, <a> cannot be a descendant of <a>. This will cause a hydration error.' The requirement of zero console errors fails, and any future SSR/prerender or hydration pass will mis-nest these nodes (browser HTML parsers auto-close the outer anchor). Behaviour in CSR is currently correct (social link wins, verified via popup), so this is a spec/robustness bug rather than a functional one. Suggested fix: keep the card as a <div> and wrap only the logo+name in a single <a> (social row as sibling), or make the card a div with role='link' + onClick window.open.",
+        "selector": "[data-testid='client-card-crats'] > span > [data-testid='client-crats-ig']",
+        "priority": "MEDIUM-HIGH"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Clients carousel",
+        "issues": [
+          "twisteast.png renders as a pale grey/blue tile with dark low-contrast lettering - the least legible logo of the 25 (mean brightness 146 but almost no colour); consider a brightness/contrast lift or a transparent-background version.",
+          "scorpios.png and tolis.png artwork sits small inside its white tile so the wordmark is barely readable at 54-62px; consider trimming the tile margin further.",
+          "yakuza.png is very dark (mean pixel brightness 35) - it reads only because of its green tile; on hover-less dark cards it is close to invisible at small sizes.",
+          "Client name colour is text-white/55 at rest (approx 3.4:1 on #0b0b0e) - below WCAG AA for small text until hover; consider white/70."
+        ]
+      },
+      {
+        "screen": "Contact form",
+        "issues": [
+          "On a failed POST the only feedback is a transient sonner toast; there is no persistent inline error state on the form (data-testid remains 'contact-status' with the default 'Αποστολή' label), so a user who misses the toast gets no indication of failure."
+        ]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "Fix the nested <a> inside <a> in Clients.js so React stops logging the hydration/nesting error while keeping the whole card clickable (e.g. absolutely-positioned overlay anchor, or anchor around logo+name only with the social row as a sibling of that anchor inside a div card).",
+    "Optional visual polish: improve legibility of twisteast (and secondarily scorpios/tolis) logo artwork.",
+    "Optional: add an inline error state to the contact form instead of relying only on the toast."
+  ],
+  "critical_code_review_comments": [
+    "Clients.js: nested interactive anchors are invalid HTML - the stopPropagation() workaround only works because CSR builds the DOM programmatically; a prerender/SSR pass would break the markup.",
+    "Clients.js: the accent hover state relies on the --a CSS var plus a 500ms colour transition, which makes it slow to assert in tests but works; no change required.",
+    "server.py: POST /api/contact stores the enquiry before attempting delivery and returns 200 even if formsubmit delivery fails (email_delivered=false). Acceptable, but the client never surfaces the email_delivered flag - consider warning the user when it is false.",
+    "server.py is small and clean; CORS middleware is added after include_router which still works but is conventionally added before."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (10/10 pytest)", "frontend": "97% (all functional assertions pass except the zero-console-errors requirement)"},
+  "seed_data_creation": "Created and then deleted 5 TEST_QA_* contact documents (POST /api/contact via curl + UI). MongoDB contacts collection cleaned back to 9 pre-existing docs.",
+  "should_call_test_agent_after_fix": false,
+  "should_main_agent_self_test": true,
+  "test_credentials": "None required (no auth in app)",
+  "context_for_next_testing_agent": "Backend suite: /app/backend/tests/backend_test.py (10 tests, all green). IMPORTANT: POST /api/contact rejects reserved TLDs such as *@example.test with 422 (pydantic EmailStr) - use @example.com in UI tests or you will wrongly see a 422. contact-status testid is the SUBMIT BUTTON label; on success the testid switches to 'contact-success'. Mobile hamburger testid is 'mobile-menu-toggle' (not mobile-menu-button) with links 'mobile-nav-{services,results,clients,contact}'. To assert on carousel cards inject '.marquee{animation:none !important}' first, otherwise Playwright hover/click times out with 'element is not stable'. Verified this iteration: 25 clients, 37 social hrefs, 7 card anchors + 9 card divs, IG icon, hover pause, accent border, stats 25+, EL/EN, mobile/tablet overflow=0, contact E2E. Only outstanding defect: nested-anchor React console error in Clients.js.",
+  "rca_of_the_issue": "Nested-anchor console error: Clients.js renders Shell='a' for cards that have c.site and then renders the SocialRow anchors as children of that same element. React's DOM nesting validator flags <a> inside <a> and warns about a hydration error. Reproduce: load the site, open the console, look for 'In HTML, <a> cannot be a descendant of <a>' (fires for the site-backed cards). Mitigation: keep the card element non-anchor and either overlay a stretched anchor beneath the social row (z-index) or anchor only the logo+name subtree."
+}

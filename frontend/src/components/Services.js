@@ -3,44 +3,52 @@ import { Video, CalendarCheck, Target, Camera, Users, Palette } from "lucide-rea
 import { useLang } from "@/i18n";
 
 const ICONS = [Video, CalendarCheck, Target, Camera, Users, Palette];
-const ACCENTS = ["#60d6ff", "#facc15", "#4ade80", "#f87171", "#a78bfa", "#38bdf8"];
+const ACCENTS = ["#60d6ff", "#facc15", "#4ade80", "#f87171", "#a78bfa", "#fb923c"];
 
 export const Services = () => {
   const { t } = useLang();
 
   return (
-    <section data-testid="services" id="services" className="relative py-24 sm:py-32">
-      <div className="mx-auto max-w-[1240px] px-5 sm:px-8">
+    <section data-testid="services" id="services" className="relative py-20 sm:py-28 lg:py-32">
+      <div className="pointer-events-none absolute right-0 top-1/4 h-[420px] w-[420px] glow-cyan opacity-50" />
+
+      <div className="relative mx-auto max-w-[1240px] px-6 sm:px-8">
         <div className="max-w-2xl">
-          <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-[#60d6ff]">{t.services.overline}</p>
-          <h2 className="mt-4 font-display text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">{t.services.title}</h2>
-          <p className="mt-5 text-base leading-relaxed text-white/50 lg:text-lg">{t.services.sub}</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-[#60d6ff] sm:text-[11px]">{t.services.overline}</p>
+          <h2 className="mt-4 font-display text-[26px] font-extrabold leading-[1.12] tracking-tight sm:text-4xl lg:text-5xl">{t.services.title}</h2>
+          <p className="mt-4 text-[13.5px] leading-relaxed text-white/50 sm:mt-5 sm:text-base lg:text-lg">{t.services.sub}</p>
         </div>
 
-        <div className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid gap-4 sm:mt-16 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
           {t.services.items.map((s, i) => {
             const Icon = ICONS[i];
-            const featured = i === 0;
+            const accent = ACCENTS[i];
             return (
               <motion.article
                 key={s.title}
                 data-testid={`service-card-${i}`}
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 26 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
+                viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.7, delay: (i % 3) * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                className={`card-sheen group rounded-3xl border border-white/[0.08] bg-[#0a0a0c] p-8 transition-colors duration-500 hover:border-white/20 ${
-                  featured ? "sm:col-span-2 lg:col-span-1" : ""
-                }`}
+                className="group relative overflow-hidden rounded-3xl bg-[#0a0a0c] p-7 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.075)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.18)] sm:p-8"
               >
-                <div
-                  className="mb-7 flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 transition-transform duration-500 group-hover:-translate-y-1"
-                  style={{ backgroundColor: `${ACCENTS[i]}14` }}
-                >
-                  <Icon className="h-5 w-5" strokeWidth={2} style={{ color: ACCENTS[i] }} />
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full opacity-[0.07] blur-3xl transition-opacity duration-700 group-hover:opacity-[0.2]"
+                  style={{ backgroundColor: accent }}
+                />
+                <div className="relative flex items-start justify-between">
+                  <div
+                    className="flex h-12 w-12 items-center justify-center rounded-2xl transition-transform duration-500 group-hover:-translate-y-1"
+                    style={{ backgroundColor: `${accent}16`, boxShadow: `inset 0 0 0 1px ${accent}30` }}
+                  >
+                    <Icon className="h-5 w-5" strokeWidth={2} style={{ color: accent }} />
+                  </div>
+                  <span className="font-display text-[11px] font-extrabold tracking-[0.22em] text-white/15">0{i + 1}</span>
                 </div>
-                <h3 className="font-display text-xl font-bold tracking-tight">{s.title}</h3>
-                <p className="mt-3.5 text-sm leading-relaxed text-white/45">{s.desc}</p>
+                <h3 className="relative mt-6 font-display text-[18px] font-bold tracking-tight sm:text-xl">{s.title}</h3>
+                <p className="relative mt-3 text-[13.5px] leading-relaxed text-white/45 sm:text-sm">{s.desc}</p>
               </motion.article>
             );
           })}

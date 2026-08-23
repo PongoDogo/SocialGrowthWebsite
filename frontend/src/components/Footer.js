@@ -4,15 +4,15 @@ import { SOCIALS } from "@/components/SocialIcons";
 export const Footer = () => {
   const { t } = useLang();
   return (
-    <footer data-testid="footer" className="border-t border-white/[0.07] py-14">
-      <div className="mx-auto flex max-w-[1240px] flex-col items-start justify-between gap-8 px-5 sm:px-8 md:flex-row md:items-center">
+    <footer data-testid="footer" className="border-t border-white/[0.07] py-12 sm:py-14">
+      <div className="mx-auto flex max-w-[1240px] flex-col items-center gap-8 px-6 text-center sm:px-8 md:flex-row md:items-center md:justify-between md:text-left">
         <div className="flex items-center gap-3">
           <img src="/logo.png" alt="SocialGrowth" className="h-9 w-9 object-contain" />
           <div>
             <p className="font-display text-base font-extrabold leading-none tracking-tight">
               Social<span className="text-[#60d6ff]">Growth</span>
             </p>
-            <p className="mt-1.5 text-xs text-white/35">{t.footer.tagline}</p>
+            <p className="mt-1.5 text-[11px] text-white/35 sm:text-xs">{t.footer.tagline}</p>
           </div>
         </div>
 
@@ -24,7 +24,7 @@ export const Footer = () => {
           ))}
         </div>
 
-        <p className="text-xs text-white/30">© {new Date().getFullYear()} SocialGrowth. {t.footer.rights}</p>
+        <p className="text-[11px] text-white/30 sm:text-xs">© {new Date().getFullYear()} SocialGrowth. {t.footer.rights}</p>
       </div>
     </footer>
   );

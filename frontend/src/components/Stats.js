@@ -42,7 +42,7 @@ const StatCard = ({ s, i }) => {
       transition={{ duration: 0.75, delay: i * 0.09, ease: [0.22, 1, 0.36, 1] }}
       className="group relative overflow-hidden rounded-[26px] border border-white/[0.08] bg-gradient-to-b from-white/[0.055] to-transparent p-px transition-colors duration-500 hover:border-white/[0.18]"
     >
-      <div className="relative h-full overflow-hidden rounded-[25px] bg-[#08080a] px-6 pb-7 pt-7 sm:px-7 sm:pb-9 sm:pt-8">
+      <div className="relative h-full overflow-hidden rounded-[25px] bg-[#08080a] px-5 pb-6 pt-6 sm:px-7 sm:pb-9 sm:pt-8">
         <motion.span
           aria-hidden
           initial={{ scaleX: 0 }}
@@ -89,8 +89,7 @@ export const Stats = () => {
   const { t } = useLang();
 
   return (
-    <section data-testid="results" id="results" className="relative overflow-hidden border-y border-white/[0.07] py-20 sm:py-28 lg:py-32">
-      <div className="pointer-events-none absolute left-1/2 top-0 h-[420px] w-[1000px] -translate-x-1/2 glow-blue opacity-60" />
+    <section data-testid="results" id="results" className="relative overflow-hidden border-y border-white/[0.07] py-20 sm:py-28 lg:py-32">      <div className="pointer-events-none absolute left-1/2 top-0 h-[420px] w-[1000px] -translate-x-1/2 glow-blue opacity-60" />
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-[0.13]"
@@ -103,16 +102,16 @@ export const Stats = () => {
         }}
       />
 
-      <div className="relative mx-auto max-w-[1240px] px-5 sm:px-8">
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+      <div className="relative mx-auto max-w-[1240px] px-6 sm:px-8">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
           <div className="max-w-2xl">
-            <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-[#60d6ff]">{t.stats.overline}</p>
-            <h2 className="mt-4 font-display text-3xl font-extrabold leading-[1.08] tracking-tight sm:text-4xl lg:text-5xl">{t.stats.title}</h2>
+            <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-[#60d6ff] sm:text-[11px]">{t.stats.overline}</p>
+            <h2 className="mt-4 font-display text-[26px] font-extrabold leading-[1.12] tracking-tight sm:text-4xl lg:text-5xl">{t.stats.title}</h2>
           </div>
-          <p className="max-w-xs text-[13px] leading-relaxed text-white/40 sm:text-sm">{t.stats.note}</p>
+          <p className="max-w-xs text-[12.5px] leading-relaxed text-white/40 sm:text-sm">{t.stats.note}</p>
         </div>
 
-        <div className="mt-12 grid grid-cols-2 gap-3 sm:mt-16 sm:gap-4 lg:grid-cols-4 lg:gap-5">
+        <div className="mt-10 grid grid-cols-2 gap-3 sm:mt-16 sm:gap-4 lg:grid-cols-4 lg:gap-5">
           {t.stats.items.map((s, i) => (
             <StatCard key={s.label} s={i === 1 ? { ...s, value: CLIENTS.length } : s} i={i} />
           ))}

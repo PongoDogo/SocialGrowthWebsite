@@ -36,7 +36,16 @@ Company: **SocialGrowth** · Email: **socialstartupagency@gmail.com** · Logo su
 
 ## Backlog
 - P0: Owner must click the one-time formsubmit.co activation email to enable delivery
-- P1: Social handles still missing for yakuza, funkytokyo, twisteast, ildesto, ypourgeio, doncarlito, euthimiou,
-  xara, nadu, barbathimios, scorpios
+- P1: Social handles still missing for funkytokyo, yakuza, twisteast, ildesto, doncarlito
 - P1: Portfolio/Videos section embedding real TikTok/Instagram/YouTube reels
 - P2: Testimonials, per-client case study pages, SEO/OG images, admin inbox for submissions
+- P2: Persistent inline error state on the contact form (currently only a sonner toast)
+
+## Logo / social research notes (2026-06)
+- Logo pipeline scripts: `fetch_logos.py` (client sites), `process_uploaded_logos.py` (owner files:
+  flood-fill bg removal that preserves interior whites, circle masking to kill outer frames,
+  rounded tiles with margin trim, brightness/contrast lift), `find_socials.py`, `probe.py`.
+- Verified sites: crats.gr, blysscafe.gr, papastavroushops.gr, tocashop.gr, ovegan269.gr, kiboko.gr,
+  arawsupermarket.gr, hairway.gr, kantinarxis.gr, onedeal.gr, 50ways.com.gr, tolissweets.gr, nadu-men.gr,
+  plus Wolt pages for Guru of Taste, Υπουργείο Γεύσεων and Μπαρμπαθύμιος.
+- Navbar desktop breakpoint is `lg` (1024px); below that the hamburger menu carries the CTA.

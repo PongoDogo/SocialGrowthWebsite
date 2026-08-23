@@ -33,7 +33,7 @@ export const Navbar = () => {
         scrolled ? "bg-black/70 backdrop-blur-xl border-b border-white/10" : "bg-transparent"
       }`}
     >
-      <div className="mx-auto max-w-[1240px] px-5 sm:px-8">
+      <div className="mx-auto max-w-[1240px] px-6 sm:px-8">
         <div className="flex h-[74px] items-center justify-between gap-6">
           <button
             data-testid="brand-logo"
@@ -49,7 +49,7 @@ export const Navbar = () => {
             </span>
           </button>
 
-          <nav className="hidden items-center gap-1 md:flex">
+          <nav className="hidden items-center gap-1 lg:flex">
             {LINKS.map((l) => (
               <button
                 key={l.id}
@@ -75,7 +75,7 @@ export const Navbar = () => {
             <button
               data-testid="nav-cta"
               onClick={() => go("contact")}
-              className="hidden items-center gap-1.5 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-black transition-transform duration-300 hover:-translate-y-0.5 sm:flex"
+              className="hidden items-center gap-1.5 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-black transition-transform duration-300 hover:-translate-y-0.5 lg:flex"
             >
               {t.nav.cta}
               <ArrowUpRight className="h-4 w-4" strokeWidth={2.4} />
@@ -84,7 +84,7 @@ export const Navbar = () => {
             <button
               data-testid="mobile-menu-toggle"
               onClick={() => setOpen((o) => !o)}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-white/12 md:hidden"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-white/12 lg:hidden"
             >
               {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -100,7 +100,7 @@ export const Navbar = () => {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-            className="overflow-hidden border-b border-white/10 bg-black/90 backdrop-blur-xl md:hidden"
+            className="overflow-hidden border-b border-white/10 bg-black/90 backdrop-blur-xl lg:hidden"
           >
             <div className="flex flex-col gap-1 px-5 py-5">
               {LINKS.map((l) => (
@@ -113,6 +113,14 @@ export const Navbar = () => {
                   {t.nav[l.key]}
                 </button>
               ))}
+              <button
+                data-testid="mobile-nav-cta"
+                onClick={() => go("contact")}
+                className="mt-2 flex items-center justify-center gap-1.5 rounded-full bg-white px-5 py-3.5 text-sm font-bold text-black"
+              >
+                {t.nav.cta}
+                <ArrowUpRight className="h-4 w-4" strokeWidth={2.4} />
+              </button>
             </div>
           </motion.div>
         )}

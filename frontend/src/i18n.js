@@ -55,6 +55,11 @@ export const STRINGS = {
       overline: "Επικοινωνία",
       title: "Ας μεγαλώσουμε το μαγαζί σου",
       sub: "Στείλε μας δύο γραμμές για το brand σου και απαντάμε εντός 24 ωρών.",
+      points: [
+        "Απάντηση εντός 24 ωρών",
+        "Δωρεάν πρώτη συμβουλευτική",
+        "Χωρίς δέσμευση συμβολαίου",
+      ],
       name: "Ονοματεπώνυμο",
       email: "Email",
       business: "Μαγαζί / Εταιρία",
@@ -120,6 +125,11 @@ export const STRINGS = {
       overline: "Contact",
       title: "Let's grow your business",
       sub: "Send us two lines about your brand and we reply within 24 hours.",
+      points: [
+        "Reply within 24 hours",
+        "Free first consultation",
+        "No long-term contract",
+      ],
       name: "Full name",
       email: "Email",
       business: "Business name",

@@ -1,0 +1,54 @@
+{
+  "summary": "Iteration 5 focused re-test of the iteration-4 nested-anchor defect plus full regression. FIX CONFIRMED: document.querySelectorAll('a a').length === 0, ZERO console errors/warnings on load and after scrolling to the clients section (checked at 1920, 768 and 390), no React nesting/hydration warning. Overlay-anchor click model verified end-to-end: clicking the LOGO area and clicking the NAME of client-card-crats both open https://crats.gr/ in a new tab (elementFromPoint over the logo resolves to client-link-crats), while clicking client-crats-ig opens instagram.com/crats.gr and leaves the main page in place - so the z-20 social row correctly wins over the z-10 overlay. All 16 site-backed clients (crats, blysscafe, papastavrou, guru, tocashop, ypourgeio, ovegan, kiboko, araw, nadu, fiftyways, onedeal, barbathimios, hairway, tolis, kantinarxis) expose client-link-<id> with the exact expected href + target=_blank + rel=noreferrer; all 9 site-less clients (pantheon, funkytokyo, yakuza, ildesto, doncarlito, euthimiou, xara, twisteast, scorpios) have ZERO client-link anchors and clicking them neither navigates nor errors. 37/37 social hrefs exact-match. Client name colour is rgba(255,255,255,0.7) at rest and rgb(255,255,255) on hover. Regression: 25 distinct clients over 3 marquee rows (1 reversed, 50 card nodes = duplicated track), 50/50 logo images decoded (0 broken), hover pauses ONLY the hovered row (running/paused/running), stat card 02 animates to 25+, EL/EN swaps all copy including English name variants (Xara Patisserie / Tolis Patisserie / Ministry of Flavors). Logo polish verified in zoomed card screenshots: twisteast = dark navy tile with white TWIST EAST wordmark, scorpios/tolis/pantheon = white tiles with artwork filling most of the tile, yakuza = dark-green tile (brighter than before but still the dimmest, mean pixel brightness 42). Mobile 390x844 and tablet 768x1024: 0 horizontal overflow at hero/clients/results/services/process/contact, card 200x158 / 224x172 with logo + name + 21x21 social icons all inside the card bounds, mobile hamburger + mobile-nav-clients scrolls (scrollY 772). Backend: 10/10 pytest green (GET /api/, POST /api/contact 200 + persisted, 6 invalid payloads -> 422, /api/contact/count increments, public GET /api/contact not exposed). Contact form desktop E2E returns success state. ONE NEW defect found (not related to this fix): the desktop navbar row overflows the viewport between ~768px and ~930px, pushing the primary 'Ξεκίνα τώρα' CTA off-screen and making it unclickable on iPad-portrait.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Navbar",
+        "issue": "TABLET REGRESSION (new, not from this fix): the desktop nav row is shown from the md breakpoint (768px) but does not fit. At 768x1024 the elements measure logo(32..205), nav links(229..701), lang-switcher(725..802), nav-cta(810..919) against a 768px viewport - the EN half of the language pill is clipped and data-testid='nav-cta' is entirely off-screen. Because body has overflow-x:hidden the documentElement scrollWidth check still reports 0 overflow, which is why earlier iterations passed it. Playwright cannot click nav-cta at 768 or 900 (timeout, element outside viewport); after switching to EN the shorter label still leaves it clipped (680..793 vs vw 768). Broken range is roughly 768px-930px; ok from 960px/1024px. The lang-switcher itself is still clickable at 768 (EL half visible) and does toggle the language. Fix: move the md:flex desktop nav to lg (1024px) or shrink the nav gap/padding and hide nav-cta below lg.",
+        "selector": "[data-testid='nav-cta'], [data-testid='lang-switcher']",
+        "priority": "MEDIUM-HIGH"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Clients carousel",
+        "issues": [
+          "yakuza.png is still the dimmest tile (mean pixel brightness 42) and the YAKUZA wordmark reads as low-contrast light-on-dark-green at 54-62px; twisteast/scorpios/tolis/pantheon are now clearly legible so only yakuza is worth another pass.",
+          "twisteast wordmark is legible but small relative to its tile - the artwork could be trimmed a bit tighter like scorpios/tolis were."
+        ]
+      },
+      {
+        "screen": "Contact form",
+        "issues": [
+          "Still no persistent inline error state on a failed POST (only the transient sonner toast). Carried over from iteration 4, unchanged."
+        ]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "Fix the navbar layout between 768px and ~930px: raise the desktop-nav breakpoint to lg (or reduce spacing) so the language switcher and the 'Ξεκίνα τώρα' CTA are fully visible and clickable on iPad-portrait.",
+    "Optional: one more brightness/contrast pass on /logos/yakuza.png (and slightly tighter trim for twisteast)."
+  ],
+  "critical_code_review_comments": [
+    "Clients.js overlay-anchor approach is correct and clean: the a a nesting is gone, the overlay covers logo+name (inset-x-0 top-0 bottom-9 z-10) and the social row sits at z-20, so hit-testing resolves as intended. The onClick stopPropagation on the social anchors is now redundant but harmless.",
+    "Navbar.js: `hidden items-center gap-1 md:flex` on the nav plus an always-visible lang switcher and `sm:flex` on nav-cta means the header content width (~890px in Greek) exceeds the md breakpoint (768px). The gate for the desktop nav and the CTA should be the same and should be lg, otherwise body{overflow-x:hidden} silently swallows the overflow.",
+    "Clients.js ClientCard img still uses loading='lazy'; on the duplicated marquee track this means off-screen duplicates are fetched late - acceptable, but eager on the first copy would remove the brief blank tiles seen while scrolling."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (10/10 pytest)", "frontend": "97% - every requested fix-verification and regression assertion passed; 1 new tablet navbar layout defect"},
+  "seed_data_creation": "Submitted one TEST_QA contact through the UI form. Afterwards deleted every document in the contacts collection matching name~TEST_ or email~test_qa (13 docs, all left over from previous QA iterations); the collection is now empty. No production data existed.",
+  "should_call_test_agent_after_fix": false,
+  "should_main_agent_self_test": true,
+  "test_credentials": "None required (no auth in app)",
+  "context_for_next_testing_agent": "Nested-anchor defect from iteration 4 is FIXED and verified (0 'a a', 0 console errors). Testing gotchas learned this run: (1) do NOT inject '.marquee{animation:none}' when asserting hover-pause - animationPlayState then always reads 'running'; test hover-pause on the live animation by moving the mouse over '.marquee-wrap' nth(n) and reading getComputedStyle(...).animationPlayState => expect running/paused/running. (2) Playwright cannot .click() the card logo/name because the overlay anchor legitimately intercepts pointer events - use page.mouse.click at the element's bounding-box centre instead, or elementFromPoint to assert the hit target. (3) There is NO data-testid='lang-en'; the switcher is a single toggle button data-testid='lang-switcher'. (4) Contact form fields are contact-name/email/business/message + contact-submit; there is no phone field; success switches to data-testid='contact-success'. (5) POST /api/contact rejects @example.test (pydantic EmailStr) - use @example.com. (6) Horizontal overflow cannot be detected via documentElement.scrollWidth because body has overflow-x:hidden - compare each fixed/nav element's getBoundingClientRect().right against window.innerWidth instead. Outstanding: navbar clipping at 768-930px.",
+  "rca_of_the_issue": "Navbar tablet clipping: Navbar.js gates the desktop link row with `md:flex` (>=768px) and the CTA with `sm:flex` (>=640px), while the mobile hamburger is hidden with `md:hidden`. At 768px the combined intrinsic width of logo (173px) + 4 Greek nav links (472px) + lang pill (77px) + CTA (109px) + gaps is ~890px, so the flex row overflows to 919px and the CTA lands outside the viewport. body{overflow-x:hidden} clips it instead of producing a scrollbar, so the element becomes visually and functionally unreachable while automated scrollWidth-based overflow checks still report 0. Reproduce: set viewport 768x1024, read document.querySelector('[data-testid=\"nav-cta\"]').getBoundingClientRect().right (=919 > 768) and try to click it -> Playwright times out. Mitigation: switch the desktop nav + CTA to the lg breakpoint (and keep the hamburger up to lg), or reduce nav padding/gap so the row fits at 768px."
+}

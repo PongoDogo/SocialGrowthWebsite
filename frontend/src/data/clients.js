@@ -1,30 +1,30 @@
 // logo: real brand logo (client's own site or file supplied by the owner)
-// tile: artwork keeps its own background, rendered as a rounded tile
-// social handles were pulled from each client's official website / verified profile
+// tile: artwork keeps its own background, rendered as a rounded tile / circle
+// site + social: verified from the client's own website, official listing or logo artwork
 export const CLIENTS = [
   { id: "crats", name: "Crats", icon: "Drumstick", logo: "/logos/crats.png", site: "https://crats.gr", social: { ig: "crats.gr", tt: "crats.gr", fb: "cratsfriedchicken" } },
   { id: "blysscafe", name: "BlyssCafe", icon: "Coffee", logo: "/logos/blysscafe.png", site: "https://blysscafe.gr", social: { ig: "blysscafe_official", tt: "blysscafe_official" } },
   { id: "papastavrou", name: "Papastavrou Shops", icon: "Bike", logo: "/logos/papastavrou.png", site: "https://www.papastavroushops.gr", social: { ig: "papastavrou_shops", tt: "papastavroushops", fb: "PapastavrouShops" } },
-  { id: "guru", name: "Guru of Taste", icon: "Utensils", logo: "/logos/guru.png", tile: true, social: { ig: "Guru_oftaste" } },
+  { id: "guru", name: "Guru of Taste", icon: "Utensils", logo: "/logos/guru.png", tile: true, site: "https://wolt.com/el/grc/athens/restaurant/guru-of-taste", social: { ig: "Guru_oftaste" } },
   { id: "pantheon", name: "Pantheon Grill", icon: "Flame", logo: "/logos/pantheon.png", social: { ig: "pantheon.grill" } },
   { id: "funkytokyo", name: "Funky Tokyo", icon: "Fish", logo: "/logos/funkytokyo.png", tile: true },
-  { id: "yakuza", name: "Yakuza", icon: "Soup", logo: "/logos/yakuza.png", tile: true },
+  { id: "yakuza", name: "Yakuza", icon: "Soup", logo: "/logos/yakuza.png" },
   { id: "tocashop", name: "TocaShop", icon: "Printer", logo: "/logos/tocashop.png", site: "https://tocashop.gr", social: { ig: "tocashop.gr", tt: "tocashop.gr", fb: "toca.advertising" } },
   { id: "ildesto", name: "il Desto", icon: "Pizza", logo: "/logos/ildesto.png" },
-  { id: "ypourgeio", name: "Υπουργείο Γεύσεων", nameEn: "Ministry of Flavors", icon: "ChefHat", logo: "/logos/ypourgeio.png" },
-  { id: "doncarlito", name: "Don Carlito", icon: "Martini", logo: "/logos/doncarlito.png", tile: true },
-  { id: "euthimiou", name: "Efthimiou Cars", icon: "CarFront", logo: "/logos/euthimiou.png" },
-  { id: "xara", name: "Ζαχαροπλαστείο Χαρά", nameEn: "Xara Patisserie", icon: "Cake", logo: "/logos/xara.png" },
+  { id: "ypourgeio", name: "Υπουργείο Γεύσεων", nameEn: "Ministry of Flavors", icon: "ChefHat", logo: "/logos/ypourgeio.png", site: "https://wolt.com/el/grc/athens/restaurant/ypourgeio-gefseon" },
+  { id: "doncarlito", name: "Don Carlito", icon: "Martini", logo: "/logos/doncarlito.png", tile: true, site: "https://wolt.com/el/grc/athens/restaurant/cocktails-and-more" },
+  { id: "euthimiou", name: "Efthimiou Cars", icon: "CarFront", logo: "/logos/euthimiou.png", social: { ig: "efthimiou.cars" } },
+  { id: "xara", name: "Ζαχαροπλαστείο Χαρά", nameEn: "Xara Patisserie", icon: "Cake", logo: "/logos/xara.png", social: { ig: "xarapatisserie" } },
   { id: "ovegan", name: "OVegan269", nameEn: "O Vegan 269", icon: "Leaf", logo: "/logos/ovegan.png", site: "https://ovegan269.gr", social: { ig: "ovegan269", tt: "ovegan269", fb: "ovegan269" } },
   { id: "kiboko", name: "Kiboko", icon: "Umbrella", logo: "/logos/kiboko.png", site: "https://www.kiboko.gr", social: { ig: "kiboko.gr", tt: "kiboko", fb: "kiboko" } },
   { id: "araw", name: "Araw Supermarket", icon: "ShoppingCart", logo: "/logos/araw.png", site: "https://arawsupermarket.gr", social: { ig: "arawsupermarket", tt: "arawsupermarket.official", fb: "arawsupermarket.official" } },
-  { id: "nadu", name: "Nadu Men", icon: "Shirt", logo: "/logos/nadu.png" },
+  { id: "nadu", name: "Nadu Men", icon: "Shirt", logo: "/logos/nadu.png", site: "https://nadu-men.gr", social: { ig: "nadumenclothing", fb: "nadumenclothing" } },
   { id: "fiftyways", name: "50ways", icon: "Footprints", logo: "/logos/fiftyways.png", site: "https://50ways.com.gr", social: { ig: "50.ways", fb: "50ways" } },
   { id: "onedeal", name: "OneDeal RentCar", icon: "CarFront", logo: "/logos/onedeal.png", site: "https://onedeal.gr", social: { ig: "onedeal36", fb: "onedealathens" } },
-  { id: "barbathimios", name: "Μπαρμπαθύμιος", nameEn: "Barbathimios", icon: "Fish", logo: "/logos/barbathimios.png" },
+  { id: "barbathimios", name: "Μπαρμπαθύμιος", nameEn: "Barbathimios", icon: "Fish", logo: "/logos/barbathimios.png", site: "https://wolt.com/el/grc/athens/restaurant/mparmpathimios-nikaia" },
   { id: "hairway", name: "Hairway", icon: "Scissors", logo: "/logos/hairway.png", site: "https://hairway.gr", social: { ig: "hairwaygrofficial", fb: "hairwaygr" } },
   { id: "tolis", name: "Τόλης Ζαχαροπλαστείο", nameEn: "Tolis Patisserie", icon: "CakeSlice", logo: "/logos/tolis.png", site: "https://tolissweets.gr", social: { ig: "tolissweets" } },
-  { id: "twisteast", name: "Twist East", icon: "Salad", logo: "/logos/twisteast.png", tile: true },
-  { id: "scorpios", name: "Scorpios Music Club", icon: "Martini", logo: "/logos/scorpios.png" },
+  { id: "twisteast", name: "Twist East", icon: "Salad", logo: "/logos/twisteast.png" },
+  { id: "scorpios", name: "Scorpios Music Club", icon: "Martini", logo: "/logos/scorpios.png", social: { ig: "scorpios_musicbar_athens", tt: "scorpiosmusicbarathens" } },
   { id: "kantinarxis", name: "Καντινάρχης", nameEn: "Kantinarxis", icon: "Sandwich", logo: "/logos/kantinarxis.png", site: "https://kantinarxis.gr", social: { ig: "kantinarxis", tt: "kantinarxis" } },
 ];
