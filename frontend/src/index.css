@@ -1,0 +1,136 @@
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Manrope:wght@400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --void: #050505;
+  --surface: #0a0a0c;
+  --brand: #2563eb;
+  --brand-light: #60d6ff;
+  --amber: #facc15;
+  --green: #4ade80;
+  --red: #f87171;
+}
+
+@layer base {
+  :root {
+    --background: 240 6% 2%;
+    --foreground: 0 0% 100%;
+    --card: 240 6% 4%;
+    --card-foreground: 0 0% 100%;
+    --popover: 240 6% 4%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 10%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 240 5% 10%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 240 5% 12%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 100%;
+    --input: 240 5% 14%;
+    --ring: 221 83% 53%;
+    --radius: 0.875rem;
+  }
+}
+
+* {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--void);
+  color: #fff;
+  font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--brand);
+  color: #fff;
+}
+
+.font-display {
+  font-family: "Bricolage Grotesque", "Manrope", sans-serif;
+}
+
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.glow-blue {
+  background: radial-gradient(circle at center, rgba(37, 99, 235, 0.35) 0%, rgba(37, 99, 235, 0) 68%);
+}
+.glow-cyan {
+  background: radial-gradient(circle at center, rgba(96, 214, 255, 0.22) 0%, rgba(96, 214, 255, 0) 70%);
+}
+
+.hairline {
+  background-image: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), transparent);
+}
+
+.marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll linear infinite;
+  will-change: transform;
+}
+.marquee-reverse {
+  animation-direction: reverse;
+}
+.marquee-wrap:hover .marquee {
+  animation-play-state: paused;
+}
+@keyframes marquee-scroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.edge-fade {
+  mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+}
+
+.card-sheen {
+  position: relative;
+  overflow: hidden;
+}
+.card-sheen::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  background: radial-gradient(600px circle at 50% 0%, rgba(96, 214, 255, 0.1), transparent 40%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+.card-sheen:hover::before {
+  opacity: 1;
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+}

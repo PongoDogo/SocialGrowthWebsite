@@ -1,0 +1,34 @@
+{
+  "summary": "First full iteration: backend pytest suite (10 tests, 100% pass) covering GET /api/, POST /api/contact happy path + persistence, 422 validation matrix, GET /api/contact ordering and no _id leakage. Frontend Playwright testing on desktop (1920x1080) and mobile (390x844): logo/hero/platforms, EL<->EN language switching (nav, hero, client tags, English client name mapping), desktop nav scroll, stats counters (100M+, 28+, 1,200+, 4), all 28 client names in the two marquee rows (56 cards, 28 unique ids, no text truncation), contact form submit with success toast + persistence verified via GET /api/contact, no console errors, no horizontal overflow. One real bug found: mobile menu links close the menu but never scroll to the section.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "GET /api/contact", "issue": "Publicly readable with no auth - leaks all submitter names/emails/messages (PII). Should be protected or removed from the public API."},
+      {"endpoint": "POST /api/contact", "issue": "deliver_email() is awaited inline with a 20s timeout, so a slow formsubmit.co response blocks the request and the user's form submit; consider background task with Mongo-first write."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "Navbar (mobile menu)", "issue": "Clicking mobile-nav-services/results/clients/contact closes the menu but the page does NOT scroll (scrollY stays 0 across all frames and after 4s). Desktop nav-* buttons work fine and a raw document.getElementById('clients').scrollIntoView({behavior:'smooth'}) works, so the failure is in go() - the setOpen(false) re-render / AnimatePresence exit animation cancels the smooth scroll. Suggested fix: defer the scroll (e.g. requestAnimationFrame/setTimeout after closing) or scroll before closing the menu.", "selector": "[data-testid='mobile-nav-clients']", "priority": "HIGH"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Clients marquee", "issues": ["Cards at the row edges are half-visible behind the edge-fade mask (expected for a marquee, noted only for awareness)."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/backend_test.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": ["Fix mobile menu navigation: mobile-nav-* buttons must scroll to their sections (defer scrollIntoView until after the menu close re-render)", "Consider protecting GET /api/contact (currently public PII listing)", "Optional: move formsubmit.co email delivery off the request path"],
+  "critical_code_review_comments": [
+    "Navbar.go(): calling setOpen(false) and scrollIntoView in the same tick breaks smooth scroll for the mobile menu; scroll must be scheduled after the exit animation starts.",
+    "GET /api/contact has no auth/rate limiting and returns up to 500 raw submissions including emails.",
+    "server.py uses deprecated @app.on_event('shutdown'); prefer FastAPI lifespan handlers."
+  ],
+  "updated_files": ["/app/backend/tests/backend_test.py"],
+  "success_rate": {"backend": "100%", "frontend": "92%"},
+  "seed_data_creation": "Created 4 TEST_* contact docs during testing (2 via API, 2 via the UI form); all were deleted from the contacts collection afterwards (collection is now empty).",
+  "should_call_test_agent_after_fix": false,
+  "should_main_agent_self_test": true,
+  "test_credentials": "N/A - app has no auth (/app/memory/test_credentials.md not needed)",
+  "context_for_next_testing_agent": "Backend suite lives at /app/backend/tests/backend_test.py (pytest, uses REACT_APP_BACKEND_URL from /app/frontend/.env; pytest.ini runs with xdist). Everything passes. Only open defect is mobile-menu navigation not scrolling; retest at 390x844 by opening data-testid='mobile-menu-toggle' then clicking mobile-nav-clients and asserting window.scrollY > 0. All 28 client names, i18n, stats counters, contact form + persistence already verified.",
+  "rca_of_the_issue": "Navbar go(id) executes setOpen(false) followed immediately by element.scrollIntoView({behavior:'smooth'}). On mobile the state change unmounts the menu via AnimatePresence, and the resulting re-render/layout animation aborts the browser's programmatic smooth-scroll animation before it advances, so scrollY never changes. Reproduced deterministically 3/3 times on 390x844; desktop path (no state change) scrolls correctly."
+}

@@ -1,0 +1,78 @@
+{
+  "theme": "dark",
+  "typography": {
+    "headings": "Cabinet Grotesk, Playfair Display (for contrast/editorial feel)",
+    "body": "Satoshi, Inter",
+    "scale_rules": {
+      "h1": "text-5xl sm:text-6xl lg:text-7xl tracking-tighter font-black",
+      "h2": "text-3xl sm:text-4xl lg:text-5xl tracking-tight",
+      "body": "text-base lg:text-lg leading-relaxed",
+      "overline": "uppercase tracking-[0.2em] text-xs font-bold text-blue-400"
+    }
+  },
+  "colors": {
+    "archetype": "Archetype 5 (Luxury) + Archetype 7 (Electric)",
+    "background": "#050505 (Deep Void Black, NEVER pure black or gray)",
+    "surface": "#0A0A0A",
+    "primary": "#2563EB (Glossy Blue, matching their 3D arrow)",
+    "accents": [
+      "#FACC15 (Yellow glass sphere)",
+      "#4ADE80 (Green glass sphere)",
+      "#F87171 (Red glass sphere)"
+    ],
+    "text": {
+      "primary": "#FFFFFF",
+      "secondary": "#A1A1AA"
+    },
+    "border": "rgba(255, 255, 255, 0.1)"
+  },
+  "visual_enhancers": {
+    "surfaces": {
+      "header": "Crystal Glass: backdrop-blur-xl bg-black/60 border-b border-white/10",
+      "cards": "Neumorphism/Tactile mix: bg-[#0A0A0A] border border-white/5 shadow-2xl hover:border-white/20 transition-colors"
+    },
+    "gradients": "Subtle radial blue/cyan glows in the background to simulate 3D light bleed. No heavy linear gradients on backgrounds.",
+    "decorations": "Use 1px borders to ground elements. Use high contrast."
+  },
+  "components": {
+    "navigation": "Sticky top header (z-50), logo on top-left (User provided logo, use an <img /> tag assuming it's in public folder, or a highly polished text fallback with blue arrow icon). Add EL/EN language switcher toggle.",
+    "hero": "Massive typography. Left aligned or center. Include the glossy 3D crystal abstract image as a floating element or background texture. CTA should be a premium pill-shaped button.",
+    "counter_section": "Scroll-triggered animated counter using framer-motion (useInView, useSpring). Must count up to '100' and append '+ Million Views'. Make the numbers massive (text-7xl+).",
+    "services": "Bento Grid layout (Mode A). Dark cards with glowing hover borders (Tracing Beam effect). Highlight TikTok, Instagram, Facebook, YouTube video production.",
+    "clients_marquee": "Smooth infinite carousel using react-fast-marquee. CRITICAL: The user wants 28 specific client logos without 'ugly corners' or 'deadspace'. DO NOT TRY TO USE RANDOM IMAGE URLS for them. Instead, create a beautiful <ClientLogo /> component that pairs a relevant lucide-react icon (e.g., Utensils for restaurants, Scissors for hair salons) with the client's name in crisp white/gray typography. This guarantees 100% clean, premium, and zero-deadspace results.",
+    "contact_form": "Minimalist premium form (Name, Email, Message). MUST send real email to 'socialstartupagency@gmail.com'. Use 'https://formsubmit.co/socialstartupagency@gmail.com' as the form action, or implement Web3Forms."
+  },
+  "layouts": {
+    "spacing": "Generous spacing. Sections should have py-24 or py-32. Containers must have internal padding (p-6 to p-8) if they have borders.",
+    "grid": "Bento Grid Protocol. Asymmetrical grids for services. 1 col mobile, 3-4 col desktop."
+  },
+  "motion": {
+    "scrolling": "Implement smooth scrolling (Lenis is highly recommended if applicable, otherwise native smooth scroll).",
+    "animations": "Framer Motion for staggered fade-ups on text and bento cards. The client marquee must be perfectly smooth."
+  },
+  "images": [
+    {
+      "url": "https://images.pexels.com/photos/29506603/pexels-photo-29506603.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "category": "Hero abstract 3D asset",
+      "description": "Multi-faceted crystal shapes for glossy 3D feel to match the brand logo vibe."
+    },
+    {
+      "url": "https://images.unsplash.com/photo-1712397943847-e104395a1a8b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAxODF8MHwxfHNlYXJjaHwxfHxibHVlJTIwbmVvbiUyMGxpZ2h0JTIwZGFyayUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzg3NDQ3NzA1fDA&ixlib=rb-4.1.0&q=85",
+      "category": "Background texture",
+      "description": "Blue wave neon light on dark background. Use as a subtle screen-blended background layer."
+    }
+  ],
+  "client_list_data": [
+    "Crats", "BlyssCafe", "papastavrou shops", "guru of taste", "kemal", "pantheon grill", "caravel", "Cofis", "Funky Tokyo", "Yakuza", "TocaShop", "il desto", "Υπουργειο γευσεων", "Don Carlito", "Euthimiou Cars", "Zaxaroplasteio Xara", "OVegan269", "Kiboko", "Araw supermarket", "Nadu Clothing", "50ways", "OneDeal RentCar", "Μπαρμπαθυμιος", "Hairway", "Τολης Ζαχαροπλαστειο", "Twist East", "Scorpios Bar", "Καντιναρχης"
+  ],
+  "instructions_to_main_agent": [
+    "IMPORTANT: Use .js (JavaScript) files for React, NOT .tsx, as specified in the rules.",
+    "Create a bilingual context or simple state to switch text between Greek (EL) and English (EN). Default to Greek.",
+    "For the 28 clients, iterate over 'client_list_data'. Map each string to a <div className='flex items-center gap-2 text-xl font-bold text-white/70 mx-8'><IconComponent /> <span>{name}</span></div>. Assign appropriate Lucide icons based on the name (e.g. coffee for BlyssCafe, car for Euthimiou Cars).",
+    "Form submission: <form action='https://formsubmit.co/socialstartupagency@gmail.com' method='POST'>. This solves the email requirement natively.",
+    "Use framer-motion to animate the '100' counter smoothly as the user scrolls to it.",
+    "Follow the 'Dark Premium' aesthetic rigorously. No generic Vercel templates. Use true black/dark gray backgrounds with blue neon glows.",
+    "All interactive and key informational elements MUST include a 'data-testid' attribute (e.g., data-testid='lang-switcher', data-testid='contact-submit')."
+  ],
+  "UNIVERSAL GUIDELINES FOR MAIN AGENT": "Do not center-align the app container. Never use AI emoji characters for icons. Always use modern interactive states (hover/focus). Implement micro-animations for all interactive elements. Use glass-morphism (backdrop-blur-xl bg-black/60) for sticky elements. Create depth with z-index. Do not use generic gradient slop; use subtle radial glows."
+}
