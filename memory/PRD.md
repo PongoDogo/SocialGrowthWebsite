@@ -34,8 +34,18 @@ Company: **SocialGrowth** · Email: **socialstartupagency@gmail.com** · Logo su
 - Backend: `GET /api/`, `POST /api/contact`, `GET /api/contact/count`
 - Removed on request: Caravel, Cofis, Kemal. Renamed: Nadu Clothing → Nadu Men, Scorpios Bar → Scorpios Music Club.
 
+## Environment recovery (2025-07)
+- Both `.env` files were MISSING (backend crashed with `KeyError: 'MONGO_URL'`, frontend had no
+  `REACT_APP_BACKEND_URL`) and `node_modules/acorn-globals` had a broken symlink blocking `yarn install`.
+- Recreated `backend/.env` (MONGO_URL, DB_NAME=socialgrowth, CORS_ORIGINS, CONTACT_EMAIL) and
+  `frontend/.env` (REACT_APP_BACKEND_URL, WDS_SOCKET_PORT=443). No product code changed.
+- Full regression PASSED: backend 10/10 (health, contact create + 5 validation cases, count, CORS, Mongo persist),
+  frontend all sections at 1920x900 and 390x844 — 0 console errors, 25/25 client logos load, EL/EN switcher,
+  stats counters (100M+, 25+, 1,200+, 4), contact form success toast, no horizontal overflow.
+- formsubmit.co activation is DONE: `email_delivered: true` — contact emails really reach
+  socialstartupagency@gmail.com.
+
 ## Backlog
-- P0: Owner must click the one-time formsubmit.co activation email to enable delivery
 - P1: Social handles still missing for funkytokyo, yakuza, twisteast, ildesto, doncarlito
 - P1: Portfolio/Videos section embedding real TikTok/Instagram/YouTube reels
 - P2: Testimonials, per-client case study pages, SEO/OG images, admin inbox for submissions
