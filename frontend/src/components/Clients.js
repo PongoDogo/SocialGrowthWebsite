@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import * as Icons from "lucide-react";
 import { CLIENTS } from "@/data/clients";
@@ -6,25 +7,43 @@ import { useLang } from "@/i18n";
 const ACCENTS = ["#60d6ff", "#facc15", "#4ade80", "#f87171", "#a78bfa"];
 
 const ClientCard = ({ c, i, lang }) => {
+  const [broken, setBroken] = useState(false);
   const Icon = Icons[c.icon] || Icons.Store;
   const accent = ACCENTS[i % ACCENTS.length];
   const label = lang === "en" && c.nameEn ? c.nameEn : c.name;
+  const showLogo = c.logo && !broken;
+  const Shell = c.site ? "a" : "div";
+
   return (
-    <div
+    <Shell
+      {...(c.site ? { href: c.site, target: "_blank", rel: "noreferrer" } : {})}
       data-testid={`client-card-${c.id}`}
-      className="group mx-3 flex h-[104px] shrink-0 items-center gap-4 whitespace-nowrap rounded-2xl border border-white/[0.08] bg-[#0a0a0c] pl-6 pr-8 transition-colors duration-500 hover:border-white/22"
+      title={label}
+      className="group mx-2.5 flex h-[138px] w-[236px] shrink-0 flex-col items-center justify-center gap-3 rounded-2xl border border-white/[0.08] bg-[#0a0a0c] px-6 transition-all duration-500 hover:-translate-y-1 hover:border-white/25"
     >
-      <span
-        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-white/10 transition-transform duration-500 group-hover:scale-105"
-        style={{ backgroundColor: `${accent}14` }}
-      >
-        <Icon className="h-[22px] w-[22px]" strokeWidth={1.9} style={{ color: accent }} />
-      </span>
-      <span>
-        <span className="block font-display text-[17px] font-bold leading-tight tracking-tight text-white/90">{label}</span>
-        <span className="mt-1 block text-[10px] font-bold uppercase tracking-[0.18em] text-white/35">{c.tag[lang]}</span>
-      </span>
-    </div>
+      {showLogo ? (
+        <span className="flex h-[66px] w-full items-center justify-center">
+          <img
+            src={c.logo}
+            alt={label}
+            loading="lazy"
+            onError={() => setBroken(true)}
+            className="max-h-[66px] max-w-[172px] object-contain opacity-90 transition-opacity duration-500 group-hover:opacity-100"
+          />
+        </span>
+      ) : (
+        <>
+          <span
+            className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 transition-transform duration-500 group-hover:scale-110"
+            style={{ backgroundColor: `${accent}14` }}
+          >
+            <Icon className="h-[21px] w-[21px]" strokeWidth={1.9} style={{ color: accent }} />
+          </span>
+          <span className="text-center font-display text-[15px] font-bold leading-tight tracking-tight text-white/90">{label}</span>
+        </>
+      )}
+      <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/30">{c.tag[lang]}</span>
+    </Shell>
   );
 };
 
@@ -40,9 +59,10 @@ const Row = ({ items, duration, reverse, lang, offset }) => (
 
 export const Clients = () => {
   const { lang, t } = useLang();
-  const half = Math.ceil(CLIENTS.length / 2);
-  const rowA = CLIENTS.slice(0, half);
-  const rowB = CLIENTS.slice(half);
+  const withLogo = CLIENTS.filter((c) => c.logo);
+  const rest = CLIENTS.filter((c) => !c.logo);
+  const rowA = [...withLogo.slice(0, 7), ...rest.slice(0, 7)];
+  const rowB = [...withLogo.slice(7), ...rest.slice(7)];
 
   return (
     <section data-testid="clients" id="clients" className="relative overflow-hidden py-24 sm:py-32">
@@ -61,10 +81,10 @@ export const Clients = () => {
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.9 }}
-        className="relative mt-16 flex flex-col gap-5"
+        className="relative mt-16 flex flex-col gap-4"
       >
-        <Row items={rowA} duration={58} lang={lang} offset={0} />
-        <Row items={rowB} duration={68} reverse lang={lang} offset={2} />
+        <Row items={rowA} duration={62} lang={lang} offset={0} />
+        <Row items={rowB} duration={74} reverse lang={lang} offset={2} />
       </motion.div>
     </section>
   );

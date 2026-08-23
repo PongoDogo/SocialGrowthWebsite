@@ -23,6 +23,14 @@ Company: **SocialGrowth** · Email: **socialstartupagency@gmail.com** · Logo su
 - Scroll-triggered animated counters: 100M+ views, 28+ brands, 1,200+ videos, 4 platforms
 - Services bento grid (6 services)
 - Clients: two opposite-direction CSS marquees, all 28 clients, pause on hover, edge fade
+- **14 real client logos** researched + fetched from the clients' own official sites by `/app/scripts/fetch_logos.py`
+  (auto trim of whitespace, background removal, white-recolour for monochrome dark marks, lightening for dark marks):
+  crats.gr, blysscafe.gr, papastavroushops.gr, caravel.gr, cofis.gr, tocashop.gr, ovegan269.gr, kiboko.gr,
+  arawsupermarket.gr, 50ways.com.gr, onedeal.gr, hairway.gr, tolissweets.gr, kantinarxis.gr.
+  Cards with a logo link to the client's site in a new tab.
+- 14 clients have no public website / hotlinkable logo (Guru of Taste, Kemal, Pantheon Grill, Funky Tokyo, Yakuza,
+  Il Desto, Υπουργείο Γεύσεων, Don Carlito, Euthimiou Cars, Ζαχαροπλαστείο Χαρά, Nadu Clothing, Μπαρμπαθύμιος,
+  Twist East, Scorpios Bar) → they render as typographic icon cards until the owner supplies the files.
 - Process (4 steps), Contact form → `POST /api/contact` (Mongo persist + real email), footer
 - Backend: `GET /api/`, `POST /api/contact`, `GET /api/contact/count`
 
