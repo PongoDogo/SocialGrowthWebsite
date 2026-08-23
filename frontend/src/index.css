@@ -45,13 +45,14 @@
 
 html {
   scroll-behavior: smooth;
+  font-size: calc(16px * var(--font-scale, 1));
 }
 
 body {
   margin: 0;
   background: var(--void);
   color: #fff;
-  font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-body, "Manrope"), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -63,7 +64,12 @@ body {
 }
 
 .font-display {
-  font-family: "Bricolage Grotesque", "Manrope", sans-serif;
+  font-family: var(--font-display, "Bricolage Grotesque"), "Manrope", sans-serif;
+}
+h1.font-display,
+h2.font-display,
+h3.font-display {
+  font-weight: var(--heading-weight, 800);
 }
 
 .grain::after {
@@ -98,6 +104,9 @@ body {
 }
 .marquee-wrap:hover .marquee {
   animation-play-state: paused;
+}
+.marquee-wrap.no-pause:hover .marquee {
+  animation-play-state: running;
 }
 @keyframes marquee-scroll {
   from {

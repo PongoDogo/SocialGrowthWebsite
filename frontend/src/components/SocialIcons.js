@@ -30,3 +30,18 @@ export const SOCIALS = [
   { name: "Facebook", Icon: FacebookIcon },
   { name: "YouTube", Icon: YouTubeIcon },
 ];
+
+export const NETWORK_ICONS = {
+  TikTok: TikTokIcon,
+  Instagram: InstagramIcon,
+  Facebook: FacebookIcon,
+  YouTube: YouTubeIcon,
+};
+
+/** handle -> profile url, per network key used across the content tree */
+export const NETWORKS = [
+  { key: "ig", label: "Instagram", Icon: InstagramIcon, url: (h) => `https://www.instagram.com/${h}/` },
+  { key: "tt", label: "TikTok", Icon: TikTokIcon, url: (h) => `https://www.tiktok.com/@${h}` },
+  { key: "fb", label: "Facebook", Icon: FacebookIcon, url: (h) => `https://www.facebook.com/${h}` },
+  { key: "yt", label: "YouTube", Icon: YouTubeIcon, url: (h) => `https://www.youtube.com/@${h}` },
+];

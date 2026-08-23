@@ -1,0 +1,962 @@
+{
+ "seo": {
+  "title": {
+   "el": "SocialGrowth — Social Media & Video Agency",
+   "en": "SocialGrowth — Social Media & Video Agency"
+  },
+  "description": {
+   "el": "Παράγουμε short-form videos που πουλάνε. TikTok, Instagram, Facebook & YouTube.",
+   "en": "Short-form video that actually sells. TikTok, Instagram, Facebook & YouTube."
+  }
+ },
+ "brand": {
+  "name": "Social",
+  "nameAccent": "Growth",
+  "logo": "/logo.png",
+  "heroImage": "/logo.png",
+  "email": "socialstartupagency@gmail.com",
+  "phone": "",
+  "location": "",
+  "socials": {
+   "ig": "",
+   "tt": "",
+   "fb": "",
+   "yt": ""
+  }
+ },
+ "theme": {
+  "accent": "#60d6ff",
+  "accentDeep": "#2563eb",
+  "accentSoft": "#a8ecff",
+  "grain": true,
+  "glows": true,
+  "gridLines": true,
+  "bg": "#050505",
+  "surface": "#0a0a0c",
+  "cardRadius": 24,
+  "borderColor": "#ffffff",
+  "borderOpacity": 8,
+  "containerWidth": 1240,
+  "fonts": {
+   "display": "Bricolage Grotesque",
+   "body": "Manrope",
+   "scale": 100,
+   "headingWeight": 800
+  },
+  "buttons": {
+   "shape": "pill",
+   "size": "md",
+   "primaryBg": "#ffffff",
+   "primaryText": "#000000",
+   "secondaryStyle": "outline",
+   "showIcons": true
+  },
+  "icons": {
+   "style": "soft",
+   "size": 100
+  }
+ },
+ "nav": {
+  "cta": {
+   "el": "Ξεκίνα τώρα",
+   "en": "Get started"
+  },
+  "showLangSwitch": true,
+  "showCta": true,
+  "logoPosition": "left",
+  "linksAlign": "center",
+  "sticky": true,
+  "blur": true,
+  "items": [
+   {
+    "id": "n1",
+    "label": {
+     "el": "Υπηρεσίες",
+     "en": "Services"
+    },
+    "type": "section",
+    "target": "services",
+    "url": "",
+    "visible": true
+   },
+   {
+    "id": "n2",
+    "label": {
+     "el": "Αποτελέσματα",
+     "en": "Results"
+    },
+    "type": "section",
+    "target": "results",
+    "url": "",
+    "visible": true
+   },
+   {
+    "id": "n3",
+    "label": {
+     "el": "Συνεργασίες",
+     "en": "Clients"
+    },
+    "type": "section",
+    "target": "clients",
+    "url": "",
+    "visible": true
+   },
+   {
+    "id": "n4",
+    "label": {
+     "el": "Επικοινωνία",
+     "en": "Contact"
+    },
+    "type": "section",
+    "target": "contact",
+    "url": "",
+    "visible": true
+   }
+  ]
+ },
+ "hero": {
+  "badge": {
+   "el": "Social Media & Video Agency",
+   "en": "Social Media & Video Agency"
+  },
+  "showBadge": true,
+  "titleA": {
+   "el": "Κάνουμε τα μαγαζιά",
+   "en": "We make local brands"
+  },
+  "titleB": {
+   "el": "viral.",
+   "en": "go viral."
+  },
+  "sub": {
+   "el": "Παράγουμε short-form videos που πουλάνε. TikTok, Instagram, Facebook & YouTube — από την ιδέα μέχρι τα εκατομμύρια προβολές.",
+   "en": "Short-form video that actually sells. TikTok, Instagram, Facebook & YouTube — from concept to millions of views."
+  },
+  "primary": {
+   "el": "Ζήτα προσφορά",
+   "en": "Get a quote"
+  },
+  "primaryTarget": "contact",
+  "secondary": {
+   "el": "Δες συνεργασίες",
+   "en": "See our clients"
+  },
+  "secondaryTarget": "clients",
+  "platformsLabel": {
+   "el": "Δουλεύουμε σε",
+   "en": "We work on"
+  },
+  "showImage": true,
+  "floatImage": true,
+  "align": "left",
+  "imageSide": "right",
+  "buttonsAlign": "left",
+  "padding": "normal",
+  "bgImage": "",
+  "bgOverlay": 60,
+  "platforms": [
+   {
+    "id": "tiktok",
+    "network": "TikTok",
+    "label": "TikTok",
+    "visible": true
+   },
+   {
+    "id": "instagram",
+    "network": "Instagram",
+    "label": "Instagram",
+    "visible": true
+   },
+   {
+    "id": "facebook",
+    "network": "Facebook",
+    "label": "Facebook",
+    "visible": true
+   },
+   {
+    "id": "youtube",
+    "network": "YouTube",
+    "label": "YouTube",
+    "visible": true
+   }
+  ]
+ },
+ "stats": {
+  "overline": {
+   "el": "Τα νούμερα μιλάνε",
+   "en": "The numbers talk"
+  },
+  "title": {
+   "el": "Αποτελέσματα, όχι υποσχέσεις",
+   "en": "Results, not promises"
+  },
+  "note": {
+   "el": "Συνολικά νούμερα από όλες τις συνεργασίες μας σε TikTok, Instagram, Facebook και YouTube.",
+   "en": "Combined figures across every collaboration on TikTok, Instagram, Facebook and YouTube."
+  },
+  "align": "left",
+  "padding": "normal",
+  "columns": 4,
+  "items": [
+   {
+    "id": "s1",
+    "value": 100,
+    "suffix": "M+",
+    "accent": "#60d6ff",
+    "visible": true,
+    "autoClients": false,
+    "label": {
+     "el": "Προβολές συνολικά",
+     "en": "Total views"
+    }
+   },
+   {
+    "id": "s2",
+    "value": 26,
+    "suffix": "+",
+    "accent": "#facc15",
+    "visible": true,
+    "autoClients": true,
+    "label": {
+     "el": "Brands & μαγαζιά",
+     "en": "Brands & shops"
+    }
+   },
+   {
+    "id": "s3",
+    "value": 1200,
+    "suffix": "+",
+    "accent": "#4ade80",
+    "visible": true,
+    "autoClients": false,
+    "label": {
+     "el": "Videos παραγωγής",
+     "en": "Videos produced"
+    }
+   },
+   {
+    "id": "s4",
+    "value": 4,
+    "suffix": "",
+    "accent": "#f87171",
+    "visible": true,
+    "autoClients": false,
+    "label": {
+     "el": "Πλατφόρμες",
+     "en": "Platforms"
+    }
+   }
+  ]
+ },
+ "services": {
+  "overline": {
+   "el": "Υπηρεσίες",
+   "en": "Services"
+  },
+  "title": {
+   "el": "Ό,τι χρειάζεται το brand σου",
+   "en": "Everything your brand needs"
+  },
+  "sub": {
+   "el": "Ένα στούντιο, όλη η δουλειά. Στρατηγική, γύρισμα, montage, δημοσίευση και ads.",
+   "en": "One studio, the whole job. Strategy, shooting, editing, publishing and ads."
+  },
+  "columns": 3,
+  "align": "left",
+  "padding": "normal",
+  "items": [
+   {
+    "id": "sv1",
+    "icon": "Video",
+    "accent": "#60d6ff",
+    "visible": true,
+    "title": {
+     "el": "Short-Form Video",
+     "en": "Short-Form Video"
+    },
+    "desc": {
+     "el": "Reels, TikToks & Shorts με hook στα πρώτα 2 δευτερόλεπτα. Γύρισμα επί τόπου στο μαγαζί σου.",
+     "en": "Reels, TikToks & Shorts hooked in the first 2 seconds. Filmed on location at your place."
+    }
+   },
+   {
+    "id": "sv2",
+    "icon": "CalendarCheck",
+    "accent": "#facc15",
+    "visible": true,
+    "title": {
+     "el": "Social Media Διαχείριση",
+     "en": "Social Media Management"
+    },
+    "desc": {
+     "el": "Πλάνο περιεχομένου, captions, hashtags, προγραμματισμός και καθημερινή παρουσία.",
+     "en": "Content plan, captions, hashtags, scheduling and daily presence."
+    }
+   },
+   {
+    "id": "sv3",
+    "icon": "Target",
+    "accent": "#4ade80",
+    "visible": true,
+    "title": {
+     "el": "Paid Ads",
+     "en": "Paid Ads"
+    },
+    "desc": {
+     "el": "Meta & TikTok καμπάνιες με στόχευση σε πελάτες που είναι δίπλα σου.",
+     "en": "Meta & TikTok campaigns targeting customers right around the corner."
+    }
+   },
+   {
+    "id": "sv4",
+    "icon": "Camera",
+    "accent": "#f87171",
+    "visible": true,
+    "title": {
+     "el": "Food & Product Videography",
+     "en": "Food & Product Videography"
+    },
+    "desc": {
+     "el": "Cinematic πλάνα φαγητού και προϊόντων που ανοίγουν την όρεξη και κλείνουν πωλήσεις.",
+     "en": "Cinematic food and product shots that build appetite and close sales."
+    }
+   },
+   {
+    "id": "sv5",
+    "icon": "Users",
+    "accent": "#a78bfa",
+    "visible": true,
+    "title": {
+     "el": "Influencer Collabs",
+     "en": "Influencer Collabs"
+    },
+    "desc": {
+     "el": "Συνεργασίες με creators που ταιριάζουν στο κοινό και στον προϋπολογισμό σου.",
+     "en": "Creator partnerships matched to your audience and your budget."
+    }
+   },
+   {
+    "id": "sv6",
+    "icon": "Palette",
+    "accent": "#fb923c",
+    "visible": true,
+    "title": {
+     "el": "Branding & Design",
+     "en": "Branding & Design"
+    },
+    "desc": {
+     "el": "Λογότυπα, μενού, αφίσες και οπτική ταυτότητα που δείχνει premium.",
+     "en": "Logos, menus, posters and a visual identity that looks premium."
+    }
+   }
+  ]
+ },
+ "clients": {
+  "overline": {
+   "el": "Συνεργασίες",
+   "en": "Clients"
+  },
+  "title": {
+   "el": "Μαγαζιά & εταιρίες που μας εμπιστεύτηκαν",
+   "en": "Shops & companies that trusted us"
+  },
+  "sub": {
+   "el": "Από καφετέριες και ψητοπωλεία μέχρι concept stores και εταιρίες αυτοκινήτων.",
+   "en": "From cafes and grill houses to concept stores and car dealers."
+  },
+  "rows": 3,
+  "speed": 54,
+  "pauseOnHover": true,
+  "showNames": true,
+  "showSocials": true,
+  "align": "left",
+  "padding": "normal",
+  "cardSize": "md",
+  "cardRadius": 22,
+  "socialsPosition": "below",
+  "logoMax": 100,
+  "items": [
+   {
+    "id": "crats",
+    "name": "Crats",
+    "nameEn": "",
+    "icon": "Drumstick",
+    "logo": "/logos/crats.png",
+    "tile": false,
+    "accent": "#e49343",
+    "site": "https://crats.gr",
+    "visible": true,
+    "social": {
+     "ig": "crats.gr",
+     "tt": "crats.gr",
+     "fb": "cratsfriedchicken",
+     "yt": ""
+    }
+   },
+   {
+    "id": "blysscafe",
+    "name": "BlyssCafe",
+    "nameEn": "",
+    "icon": "Coffee",
+    "logo": "/logos/blysscafe.png",
+    "tile": false,
+    "accent": "#d69351",
+    "site": "https://blysscafe.gr",
+    "visible": true,
+    "social": {
+     "ig": "blysscafe_official",
+     "tt": "blysscafe_official",
+     "fb": "",
+     "yt": ""
+    }
+   },
+   {
+    "id": "papastavrou",
+    "name": "Papastavrou Shops",
+    "nameEn": "",
+    "icon": "Bike",
+    "logo": "/logos/papastavrou.png",
+    "tile": false,
+    "accent": "#f63162",
+    "site": "https://www.papastavroushops.gr",
+    "visible": true,
+    "social": {
+     "ig": "papastavrou_shops",
+     "tt": "papastavroushops",
+     "fb": "PapastavrouShops",
+     "yt": ""
+    }
+   },
+   {
+    "id": "guru",
+    "name": "Guru of Taste",
+    "nameEn": "",
+    "icon": "Utensils",
+    "logo": "/logos/guru.png",
+    "tile": true,
+    "accent": "#e49343",
+    "site": "https://wolt.com/el/grc/athens/restaurant/guru-of-taste",
+    "visible": true,
+    "social": {
+     "ig": "Guru_oftaste",
+     "tt": "",
+     "fb": "",
+     "yt": ""
+    }
+   },
+   {
+    "id": "pantheon",
+    "name": "Pantheon Grill",
+    "nameEn": "",
+    "icon": "Flame",
+    "logo": "/logos/pantheon.png",
+    "tile": false,
+    "accent": "#e1b283",
+    "site": "",
+    "visible": true,
+    "social": {
+     "ig": "pantheon.grill",
+     "tt": "",
+     "fb": "",
+     "yt": ""
+    }
+   },
+   {
+    "id": "funkytokyo",
+    "name": "Funky Tokyo",
+    "nameEn": "",
+    "icon": "Fish",
+    "logo": "/logos/funkytokyo.png",
+    "tile": true,
+    "accent": "#d651b5",
+    "site": "",
+    "visible": true,
+    "social": {
+     "ig": "",
+     "tt": "",
+     "fb": "",
+     "yt": ""
+    }
+   },
+   {
+    "id": "yakuza",
+    "name": "Yakuza",
+    "nameEn": "",
+    "icon": "Soup",
+    "logo": "/logos/yakuza.png",
+    "tile": false,
+    "accent": "#d6b551",
+    "site": "",
+    "visible": true,
+    "social": {
+     "ig": "",
+     "tt": "",
+     "fb": "",
+     "yt": ""
+    }
+   },
+   {
+    "id": "tocashop",
+    "name": "TocaShop",
+    "nameEn": "",
+    "icon": "Printer",
+    "logo": "/logos/tocashop.png",
+    "tile": false,
+    "accent": "#4393e4",
+    "site": "https://tocashop.gr",
+    "visible": true,
+    "social": {
+     "ig": "tocashop.gr",
+     "tt": "tocashop.gr",
+     "fb": "toca.advertising",
+     "yt": ""
+    }
+   },
+   {
+    "id": "ildesto",
+    "name": "il Desto",
+    "nameEn": "",
+    "icon": "Pizza",
+    "logo": "/logos/ildesto.png",
+    "tile": false,
+    "accent": "#60d6ff",
+    "site": "",
+    "visible": true,
+    "social": {
+     "ig": "",
+     "tt": "",
+     "fb": "",
+     "yt": ""
+    }
+   },
+   {
+    "id": "ypourgeio",
+    "name": "Υπουργείο Γεύσεων",
+    "nameEn": "Ministry of Flavors",
+    "icon": "ChefHat",
+    "logo": "/logos/ypourgeio.png",
+    "tile": false,
+    "accent": "#60d6ff",
+    "site": "https://wolt.com/el/grc/athens/restaurant/ypourgeio-gefseon",
+    "visible": true,
+    "social": {
+     "ig": "",
+     "tt": "",
+     "fb": "",
+     "yt": ""
+    }
+   },
+   {
+    "id": "doncarlito",
+    "name": "Don Carlito",
+    "nameEn": "",
+    "icon": "Martini",
+    "logo": "/logos/doncarlito.png",
+    "tile": true,
+    "accent": "#e49343",
+    "site": "https://wolt.com/el/grc/athens/restaurant/cocktails-and-more",
+    "visible": true,
+    "social": {
+     "ig": "",
+     "tt": "",
+     "fb": "",
+     "yt": ""
+    }
+   },
+   {
+    "id": "euthimiou",
+    "name": "Efthimiou Cars",
+    "nameEn": "",
+    "icon": "CarFront",
+    "logo": "/logos/euthimiou.png",
+    "tile": false,
+    "accent": "#f8d56c",
+    "site": "",
+    "visible": true,
+    "social": {
+     "ig": "efthimiou.cars",
+     "tt": "",
+     "fb": "",
+     "yt": ""
+    }
+   },
+   {
+    "id": "xara",
+    "name": "Ζαχαροπλαστείο Χαρά",
+    "nameEn": "Xara Patisserie",
+    "icon": "Cake",
+    "logo": "/logos/xara.png",
+    "tile": false,
+    "accent": "#eb79b2",
+    "site": "",
+    "visible": true,
+    "social": {
+     "ig": "xarapatisserie",
+     "tt": "",
+     "fb": "",
+     "yt": ""
+    }
+   },
+   {
+    "id": "ovegan",
+    "name": "OVegan269",
+    "nameEn": "O Vegan 269",
+    "icon": "Leaf",
+    "logo": "/logos/ovegan.png",
+    "tile": false,
+    "accent": "#e19a83",
+    "site": "https://ovegan269.gr",
+    "visible": true,
+    "social": {
+     "ig": "ovegan269",
+     "tt": "ovegan269",
+     "fb": "ovegan269",
+     "yt": ""
+    }
+   },
+   {
+    "id": "kiboko",
+    "name": "Kiboko",
+    "nameEn": "",
+    "icon": "Umbrella",
+    "logo": "/logos/kiboko.png",
+    "tile": false,
+    "accent": "#60d6ff",
+    "site": "https://www.kiboko.gr",
+    "visible": true,
+    "social": {
+     "ig": "kiboko.gr",
+     "tt": "kiboko",
+     "fb": "kiboko",
+     "yt": ""
+    }
+   },
+   {
+    "id": "araw",
+    "name": "Araw Supermarket",
+    "nameEn": "",
+    "icon": "ShoppingCart",
+    "logo": "/logos/araw.png",
+    "tile": false,
+    "accent": "#e46b43",
+    "site": "https://arawsupermarket.gr",
+    "visible": true,
+    "social": {
+     "ig": "arawsupermarket",
+     "tt": "arawsupermarket.official",
+     "fb": "arawsupermarket.official",
+     "yt": ""
+    }
+   },
+   {
+    "id": "nadu",
+    "name": "Nadu Men",
+    "nameEn": "",
+    "icon": "Shirt",
+    "logo": "/logos/nadu.png",
+    "tile": false,
+    "accent": "#f8f86c",
+    "site": "https://nadu-men.gr",
+    "visible": true,
+    "social": {
+     "ig": "nadumenclothing",
+     "tt": "",
+     "fb": "nadumenclothing",
+     "yt": ""
+    }
+   },
+   {
+    "id": "fiftyways",
+    "name": "50ways",
+    "nameEn": "",
+    "icon": "Footprints",
+    "logo": "/logos/fiftyways.png",
+    "tile": false,
+    "accent": "#60d6ff",
+    "site": "https://50ways.com.gr",
+    "visible": true,
+    "social": {
+     "ig": "50.ways",
+     "tt": "",
+     "fb": "50ways",
+     "yt": ""
+    }
+   },
+   {
+    "id": "onedeal",
+    "name": "OneDeal RentCar",
+    "nameEn": "",
+    "icon": "CarFront",
+    "logo": "/logos/onedeal.png",
+    "tile": false,
+    "accent": "#60d6ff",
+    "site": "https://onedeal.gr",
+    "visible": true,
+    "social": {
+     "ig": "onedeal36",
+     "tt": "",
+     "fb": "onedealathens",
+     "yt": ""
+    }
+   },
+   {
+    "id": "barbathimios",
+    "name": "Μπαρμπαθύμιος",
+    "nameEn": "Barbathimios",
+    "icon": "Fish",
+    "logo": "/logos/barbathimios.png",
+    "tile": false,
+    "accent": "#e4bc43",
+    "site": "https://wolt.com/el/grc/athens/restaurant/mparmpathimios-nikaia",
+    "visible": true,
+    "social": {
+     "ig": "",
+     "tt": "",
+     "fb": "",
+     "yt": ""
+    }
+   },
+   {
+    "id": "hairway",
+    "name": "Hairway",
+    "nameEn": "",
+    "icon": "Scissors",
+    "logo": "/logos/hairway.png",
+    "tile": false,
+    "accent": "#f63131",
+    "site": "https://hairway.gr",
+    "visible": true,
+    "social": {
+     "ig": "hairwaygrofficial",
+     "tt": "",
+     "fb": "hairwaygr",
+     "yt": ""
+    }
+   },
+   {
+    "id": "tolis",
+    "name": "Τόλης Ζαχαροπλαστείο",
+    "nameEn": "Tolis Patisserie",
+    "icon": "CakeSlice",
+    "logo": "/logos/tolis.png",
+    "tile": false,
+    "accent": "#ebb279",
+    "site": "https://tolissweets.gr",
+    "visible": true,
+    "social": {
+     "ig": "tolissweets",
+     "tt": "",
+     "fb": "",
+     "yt": ""
+    }
+   },
+   {
+    "id": "twisteast",
+    "name": "Twist East",
+    "nameEn": "",
+    "icon": "Salad",
+    "logo": "/logos/twisteast.png",
+    "tile": false,
+    "accent": "#e1ca83",
+    "site": "",
+    "visible": true,
+    "social": {
+     "ig": "",
+     "tt": "",
+     "fb": "",
+     "yt": ""
+    }
+   },
+   {
+    "id": "scorpios",
+    "name": "Scorpios Music Club",
+    "nameEn": "",
+    "icon": "Martini",
+    "logo": "/logos/scorpios.png",
+    "tile": false,
+    "accent": "#d65151",
+    "site": "",
+    "visible": true,
+    "social": {
+     "ig": "scorpios_musicbar_athens",
+     "tt": "scorpiosmusicbarathens",
+     "fb": "",
+     "yt": ""
+    }
+   },
+   {
+    "id": "kantinarxis",
+    "name": "Καντινάρχης",
+    "nameEn": "Kantinarxis",
+    "icon": "Sandwich",
+    "logo": "/logos/kantinarxis.png",
+    "tile": false,
+    "accent": "#f6f631",
+    "site": "https://kantinarxis.gr",
+    "visible": true,
+    "social": {
+     "ig": "kantinarxis",
+     "tt": "kantinarxis",
+     "fb": "",
+     "yt": ""
+    }
+   }
+  ]
+ },
+ "process": {
+  "overline": {
+   "el": "Πώς δουλεύουμε",
+   "en": "How we work"
+  },
+  "title": {
+   "el": "Τέσσερα βήματα",
+   "en": "Four steps"
+  },
+  "align": "left",
+  "padding": "normal",
+  "items": [
+   {
+    "id": "p1",
+    "accent": "#60d6ff",
+    "visible": true,
+    "title": {
+     "el": "Γνωριμία",
+     "en": "Discovery"
+    },
+    "desc": {
+     "el": "Μαθαίνουμε το μαγαζί, το κοινό και τους στόχους.",
+     "en": "We learn your shop, audience and goals."
+    }
+   },
+   {
+    "id": "p2",
+    "accent": "#facc15",
+    "visible": true,
+    "title": {
+     "el": "Στρατηγική",
+     "en": "Strategy"
+    },
+    "desc": {
+     "el": "Χτίζουμε content plan με concepts και ημερολόγιο.",
+     "en": "We build a content plan with concepts and a calendar."
+    }
+   },
+   {
+    "id": "p3",
+    "accent": "#4ade80",
+    "visible": true,
+    "title": {
+     "el": "Παραγωγή",
+     "en": "Production"
+    },
+    "desc": {
+     "el": "Ερχόμαστε, γυρίζουμε, κάνουμε montage.",
+     "en": "We show up, we shoot, we edit."
+    }
+   },
+   {
+    "id": "p4",
+    "accent": "#f87171",
+    "visible": true,
+    "title": {
+     "el": "Ανάπτυξη",
+     "en": "Growth"
+    },
+    "desc": {
+     "el": "Δημοσίευση, ads, μέτρηση και βελτιστοποίηση.",
+     "en": "Publishing, ads, measuring and optimising."
+    }
+   }
+  ]
+ },
+ "contact": {
+  "overline": {
+   "el": "Επικοινωνία",
+   "en": "Contact"
+  },
+  "title": {
+   "el": "Ας μεγαλώσουμε το μαγαζί σου",
+   "en": "Let's grow your business"
+  },
+  "sub": {
+   "el": "Στείλε μας δύο γραμμές για το brand σου και απαντάμε εντός 24 ωρών.",
+   "en": "Send us two lines about your brand and we reply within 24 hours."
+  },
+  "showEmail": true,
+  "align": "left",
+  "padding": "normal",
+  "formSide": "right",
+  "points": [
+   {
+    "el": "Απάντηση εντός 24 ωρών",
+    "en": "Reply within 24 hours"
+   },
+   {
+    "el": "Δωρεάν πρώτη συμβουλευτική",
+    "en": "Free first consultation"
+   },
+   {
+    "el": "Χωρίς δέσμευση συμβολαίου",
+    "en": "No long-term contract"
+   }
+  ],
+  "labels": {
+   "name": {
+    "el": "Ονοματεπώνυμο",
+    "en": "Full name"
+   },
+   "email": {
+    "el": "Email",
+    "en": "Email"
+   },
+   "business": {
+    "el": "Μαγαζί / Εταιρία",
+    "en": "Business name"
+   },
+   "message": {
+    "el": "Πες μας τι θέλεις",
+    "en": "Tell us what you need"
+   },
+   "send": {
+    "el": "Αποστολή",
+    "en": "Send message"
+   },
+   "sending": {
+    "el": "Αποστολή...",
+    "en": "Sending..."
+   },
+   "ok": {
+    "el": "Ευχαριστούμε! Το μήνυμα στάλθηκε.",
+    "en": "Thank you! Your message was sent."
+   },
+   "err": {
+    "el": "Κάτι πήγε λάθος. Δοκίμασε ξανά.",
+    "en": "Something went wrong. Please try again."
+   }
+  }
+ },
+ "footer": {
+  "tagline": {
+   "el": "Social media & video production agency.",
+   "en": "Social media & video production agency."
+  },
+  "rights": {
+   "el": "Όλα τα δικαιώματα κατοχυρωμένα.",
+   "en": "All rights reserved."
+  },
+  "showSocials": true,
+  "layout": "spread",
+  "links": []
+ },
+ "layout": {
+  "order": [
+   "hero",
+   "clients",
+   "stats",
+   "services",
+   "process",
+   "contact"
+  ],
+  "hidden": []
+ }
+}

@@ -1,7 +1,6 @@
 from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 import uuid
@@ -13,11 +12,19 @@ from datetime import datetime, timezone
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+from db import client, db  # noqa: E402  (loads MONGO_URL / DB_NAME from the same .env)
+from admin import admin_router, public_router, get_stage  # noqa: E402
 
 CONTACT_EMAIL = os.environ['CONTACT_EMAIL']
+
+
+async def recipient_email() -> str:
+    """The owner can change the recipient from the Studio; fall back to .env."""
+    try:
+        data = await get_stage("published")
+        return (data.get("brand") or {}).get("email") or CONTACT_EMAIL
+    except Exception:
+        return CONTACT_EMAIL
 
 app = FastAPI(title="SocialGrowth API")
 api_router = APIRouter(prefix="/api")
@@ -40,6 +47,7 @@ class Contact(ContactCreate):
 
 
 async def deliver_email(payload: ContactCreate) -> bool:
+    to = await recipient_email()
     body = {
         "name": payload.name,
         "email": payload.email,
@@ -51,7 +59,7 @@ async def deliver_email(payload: ContactCreate) -> bool:
     }
     try:
         async with httpx.AsyncClient(timeout=20) as http:
-            r = await http.post(f"https://formsubmit.co/ajax/{CONTACT_EMAIL}", json=body)
+            r = await http.post(f"https://formsubmit.co/ajax/{to}", json=body)
         return r.status_code == 200
     except Exception as exc:
         logger.error("Email delivery failed: %s", exc)
@@ -88,6 +96,8 @@ async def contact_count():
 
 
 app.include_router(api_router)
+app.include_router(admin_router)
+app.include_router(public_router)
 
 app.add_middleware(
     CORSMiddleware,

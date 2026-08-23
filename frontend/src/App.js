@@ -1,31 +1,21 @@
 import "@/App.css";
+import React from "react";
 import { Toaster } from "sonner";
-import { LangProvider } from "@/i18n";
-import { Navbar } from "@/components/Navbar";
-import { Hero } from "@/components/Hero";
-import { Stats } from "@/components/Stats";
-import { Services } from "@/components/Services";
-import { Clients } from "@/components/Clients";
-import { Process } from "@/components/Process";
-import { Contact } from "@/components/Contact";
-import { Footer } from "@/components/Footer";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import PublicSite from "@/PublicSite";
+import Studio from "@/studio/Studio";
+
+const STUDIO_PATH = (process.env.REACT_APP_STUDIO_PATH || "studio").replace(/^\/+/, "");
 
 export default function App() {
   return (
-    <LangProvider>
-      <div className="App grain" data-testid="app-root">
-        <Navbar />
-        <main>
-          <Hero />
-          <Clients />
-          <Stats />
-          <Services />
-          <Process />
-          <Contact />
-        </main>
-        <Footer />
-        <Toaster theme="dark" position="bottom-right" />
-      </div>
-    </LangProvider>
+    <BrowserRouter>
+      <Routes>
+        <Route path={`/${STUDIO_PATH}`} element={<Studio />} />
+        <Route path={`/${STUDIO_PATH}/*`} element={<Studio />} />
+        <Route path="*" element={<PublicSite />} />
+      </Routes>
+      <Toaster theme="dark" position="bottom-right" />
+    </BrowserRouter>
   );
 }

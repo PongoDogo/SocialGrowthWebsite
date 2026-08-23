@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /studio-49d22dc4
+Disallow: /studio-49d22dc4/
