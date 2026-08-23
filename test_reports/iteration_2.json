@@ -1,0 +1,35 @@
+{
+  "summary": "Iteration 2 full regression of SocialGrowth. Backend: 10/10 pytest cases pass (GET /api/, POST /api/contact happy path + 6 validation cases -> 422, GET /api/contact/count increments, public PII listing GET /api/contact correctly returns 405). Frontend: verified new section order (Hero->Clients->Results->Services->Process->Contact), 3-row clients marquee with duplication + hover pause, Caravel/Cofis fully removed, 26 distinct clients each showing the shop NAME (no category tags), all 16 logo files decode (naturalWidth>0) incl. the 5 new ones (tolis, euthimiou, yakuza, funkytokyo, twisteast), site-backed cards render as <a target=_blank> and site-less cards as <div>, 4 stat cards with 01..04 index labels animating to 100M+/26+/1,200+/4, EL<->EN switch swaps all copy incl. stats.note and the 6 English client-name variants. Mobile 390x844: zero horizontal overflow at all 6 scroll positions, hero CTAs both full width (350px) and left-aligned at x=20, stats render as 2-col grid (169px 169px), all 4 mobile-nav links open the menu and scroll their section to the top, no card clipping (rowH==cardH==132). Tablet 768x1024: no overflow at any section, 3 marquee rows visible. Contact form e2e submit returns 200, resets the form, shows the sonner success toast and the inline button success state. No blocking issues found.",
+  "backend_issues": { "critical": [], "minor": [] },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Clients carousel (mobile 390px)",
+        "issues": [
+          "Low-contrast logo artwork: the OVegan269 and Τόλης Sweets n' Eats tile logos are dark brown/near-black on the #0b0b0e card, so they read as smudges at 56px. Consider a light tile background for `tile: true` logos or a slight brightness boost.",
+          "Nit: tile logos render at 56/64px while wordmark logos get up to 150/166px width, so tile brands look visually smaller/weaker than their neighbours in the same row."
+        ]
+      }
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/backend_test.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [
+    "Optional polish only: improve contrast/sizing of the dark `tile: true` logos (ovegan, tolis) on mobile.",
+    "Optional: derive the '26+' stats value from CLIENTS.length instead of hardcoding it in i18n.js (both EL and EN) so it cannot drift when clients are added/removed."
+  ],
+  "critical_code_review_comments": [
+    "i18n.js hardcodes the client count (26) in two places while data/clients.js is the source of truth - duplication that already caused a mismatch risk in this iteration.",
+    "Stats Counter uses useInView({once:true}) inside a component that remounts on language switch, so all counters restart from 0 and re-animate when the user toggles EL/EN. Cosmetic, but a persisted final value would be smoother.",
+    "Clients.js ClientCard onError -> setBroken falls back to the lucide icon; verified no runtime crash for site-less cards (rendered as div, no href/target attributes)."
+  ],
+  "updated_files": ["/app/backend/tests/backend_test.py"],
+  "success_rate": { "backend": "100%", "frontend": "100%" },
+  "seed_data_creation": "Created 4 TEST_ contact submissions in the contacts collection via POST /api/contact (TEST_User_*, TEST_NoBiz_*, TEST_Count_*, TEST QA Bot, TEST Toast Check). No delete endpoint exists so they remain; harmless.",
+  "should_call_test_agent_after_fix": false,
+  "should_main_agent_self_test": true,
+  "test_credentials": "None required - app has no auth",
+  "context_for_next_testing_agent": "Backend tests live in /app/backend/tests/backend_test.py (pytest, 10 cases). I replaced the stale TestContactList (GET /api/contact was intentionally removed in iteration 2) with TestContactCount which also asserts GET /api/contact returns 404/405 so the PII listing cannot silently come back. For the clients carousel, inject `.marquee{animation:none !important}` before asserting geometry, and use hover(force=True) for the pause check because the animating row is never 'stable' for Playwright. Substring scans for removed category tags give false positives on 'Vegan' (OVegan269) and 'Grill' (Pantheon Grill) - those are legitimate shop names; assert on exact text nodes instead. All 26 clients, 3 rows, logos and mobile/tablet responsiveness verified green in this iteration.",
+  "rca_of_the_issue": "The only two failures seen were in the pre-existing test file, not the app: it still asserted GET /api/contact returned 200, but the endpoint was deliberately removed this iteration and replaced with GET /api/contact/count. Fixed the tests (in-scope test-code change) and re-ran to 10/10 green. An initial 'broken logo' signal for /logos/kantinarxis.png was a lazy-loading artifact (loading=\"lazy\" on off-screen marquee duplicates); forcing eager load showed all 32 img nodes decoded with naturalWidth>0, and the asset serves 200 / 10472 bytes / image/png."
+}

@@ -15,9 +15,10 @@ export const STRINGS = {
     stats: {
       overline: "Τα νούμερα μιλάνε",
       title: "Αποτελέσματα, όχι υποσχέσεις",
+      note: "Συνολικά νούμερα από όλες τις συνεργασίες μας σε TikTok, Instagram, Facebook και YouTube.",
       items: [
         { value: 100, suffix: "M+", label: "Προβολές συνολικά" },
-        { value: 28, suffix: "+", label: "Brands & μαγαζιά" },
+        { value: 26, suffix: "+", label: "Brands & μαγαζιά" },
         { value: 1200, suffix: "+", label: "Videos παραγωγής" },
         { value: 4, suffix: "", label: "Πλατφόρμες" },
       ],
@@ -79,9 +80,10 @@ export const STRINGS = {
     stats: {
       overline: "The numbers talk",
       title: "Results, not promises",
+      note: "Combined figures across every collaboration on TikTok, Instagram, Facebook and YouTube.",
       items: [
         { value: 100, suffix: "M+", label: "Total views" },
-        { value: 28, suffix: "+", label: "Brands & shops" },
+        { value: 26, suffix: "+", label: "Brands & shops" },
         { value: 1200, suffix: "+", label: "Videos produced" },
         { value: 4, suffix: "", label: "Platforms" },
       ],

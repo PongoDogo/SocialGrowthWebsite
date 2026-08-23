@@ -22,12 +22,11 @@ LOGOS = {
     "kantinarxis": "https://kantinarxis.gr/logo-arc.png",
     "onedeal": "https://onedeal.gr/wp-content/uploads/2025/04/Onedeal-white-logo-e1744445674631.png",
     "fiftyways": "https://50ways.com.gr/wp-content/uploads/2025/04/fifty-ways-logo-b-w-2024.png",
-    "tolis": "https://tolissweets.gr/images/logo.png",
 }
 # Monochrome dark logos -> recolour to white so they read on the dark theme.
 INVERT = {"cofis", "fiftyways"}
 # Dark logos -> lift them toward light while keeping their hue.
-LIGHTEN = {"ovegan", "tolis"}
+LIGHTEN = {"ovegan"}
 LOGOS.update(dict(x.split("=", 1) for x in sys.argv[1:]))
 
 
@@ -93,8 +92,8 @@ for key, url in sorted(LOGOS.items()):
             for y in range(im.size[1]):
                 for x in range(im.size[0]):
                     r, g, b, a = px[x, y]
-                    if a > 8 and (r + g + b) / 3 < 150:
-                        px[x, y] = (r + int((255 - r) * 0.80), g + int((255 - g) * 0.80), b + int((255 - b) * 0.80), a)
+                    if a > 8 and (r + g + b) / 3 < 165:
+                        px[x, y] = (r + int((255 - r) * 0.88), g + int((255 - g) * 0.88), b + int((255 - b) * 0.88), a)
         bbox = im.getbbox()
         if bbox:
             im = im.crop(bbox)

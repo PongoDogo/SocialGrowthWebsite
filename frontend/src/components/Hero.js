@@ -50,11 +50,11 @@ export const Hero = () => {
             {t.hero.sub}
           </motion.p>
 
-          <motion.div {...rise(0.24)} className="mt-10 flex flex-wrap items-center gap-3">
+          <motion.div {...rise(0.24)} className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <button
               data-testid="hero-cta-primary"
               onClick={() => go("contact")}
-              className="group flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-bold text-black transition-transform duration-300 hover:-translate-y-0.5"
+              className="group flex w-full items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-bold text-black transition-transform duration-300 hover:-translate-y-0.5 sm:w-auto"
             >
               {t.hero.primary}
               <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" strokeWidth={2.5} />
@@ -62,7 +62,7 @@ export const Hero = () => {
             <button
               data-testid="hero-cta-secondary"
               onClick={() => go("clients")}
-              className="flex items-center gap-2 rounded-full border border-white/15 px-7 py-3.5 text-sm font-semibold text-white/80 transition-colors duration-300 hover:border-white/35 hover:text-white"
+              className="flex w-full items-center justify-center gap-2 rounded-full border border-white/15 px-7 py-3.5 text-sm font-semibold text-white/80 transition-colors duration-300 hover:border-white/35 hover:text-white sm:w-auto"
             >
               <Play className="h-3.5 w-3.5" strokeWidth={2.5} />
               {t.hero.secondary}

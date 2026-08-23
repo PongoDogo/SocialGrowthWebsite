@@ -51,13 +51,10 @@ class TestContactCreate:
         assert isinstance(d["email_delivered"], bool)
         assert "_id" not in d
 
-        # verify persisted via list endpoint
-        lr = api.get(f"{BASE_URL}/api/contact", timeout=30)
-        assert lr.status_code == 200
-        items = lr.json()
-        found = [x for x in items if x["id"] == d["id"]]
-        assert found, "created contact not found in GET /api/contact"
-        assert found[0]["message"] == payload["message"]
+        # verify persisted via count endpoint (PII listing endpoint removed by design)
+        cr = api.get(f"{BASE_URL}/api/contact/count", timeout=30)
+        assert cr.status_code == 200, cr.text
+        assert isinstance(cr.json()["count"], int) and cr.json()["count"] >= 1
 
     def test_optional_business_defaults_empty(self, api):
         marker = uuid.uuid4().hex[:8]
@@ -88,14 +85,26 @@ class TestContactValidation:
         assert r.status_code == 422, f"{payload} -> {r.status_code} {r.text[:200]}"
 
 
-# --- Module: contact list ordering / leakage ---
-class TestContactList:
-    def test_list_sorted_desc_and_no_mongo_id(self, api):
-        r = api.get(f"{BASE_URL}/api/contact", timeout=30)
-        assert r.status_code == 200
-        items = r.json()
-        assert isinstance(items, list)
-        for it in items:
-            assert "_id" not in it
-        created = [it["created_at"] for it in items]
-        assert created == sorted(created, reverse=True), "not newest-first"
+# --- Module: contact count + no public PII listing ---
+class TestContactCount:
+    def test_count_increments_and_no_pii_listing(self, api):
+        before = api.get(f"{BASE_URL}/api/contact/count", timeout=30)
+        assert before.status_code == 200, before.text
+        b = before.json()["count"]
+        assert isinstance(b, int)
+
+        marker = uuid.uuid4().hex[:8]
+        cr = api.post(
+            f"{BASE_URL}/api/contact",
+            json={"name": f"TEST_Count_{marker}", "email": f"c_{marker}@example.com", "message": "TEST count"},
+            timeout=60,
+        )
+        assert cr.status_code == 200, cr.text
+
+        after = api.get(f"{BASE_URL}/api/contact/count", timeout=30)
+        assert after.status_code == 200
+        assert after.json()["count"] == b + 1
+
+        # public listing of submissions must not be exposed
+        lr = api.get(f"{BASE_URL}/api/contact", timeout=30)
+        assert lr.status_code in (404, 405), f"PII listing exposed: {lr.status_code}"
