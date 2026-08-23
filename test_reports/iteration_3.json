@@ -1,0 +1,51 @@
+{
+  "summary": "Iteration 3 full re-test of SocialGrowth: backend regression (10 pytest cases, 100% pass) + frontend verification of the logo/client-data changes on desktop 1920, mobile 390x844 and tablet 768x1024. All 11 requested items PASS: Kemal fully removed (no text, no client-card-kemal), exactly 25 distinct clients across 3 marquee rows (50 cards incl. marquee duplicates), 'Nadu Men' present / 'Nadu Clothing' absent, 'Scorpios Music Club' present, all 25 clients render a real <img> logo that decodes (naturalWidth>0, zero lucide fallbacks, all /logos/*.png return 200), all 31 social anchors exist with correct hrefs / target=_blank / rel=noreferrer (client-blysscafe-fb correctly absent), the 11 handle-less shops render no social links and keep identical card height (158px mobile / 172px desktop+tablet, no clipping, no row overlap), clicking a social icon opens a new tab without navigating the card, stats card 02 animates to 25+ (CLIENTS.length driven), EL/EN switcher swaps all 6 English client name variants, and no horizontal page overflow on mobile or tablet (scrollWidth == clientWidth). Contact form E2E also re-verified end-to-end (submit -> success state).",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Clients carousel (mobile 390x844)",
+        "issues": [
+          "Social icon anchors have a 15x15px hit area on mobile (measured for all 31 links). Below WCAG 2.5.8 minimum 24x24 and well below the 44px touch guideline - taps still work but are easy to miss. Suggest adding p-1.5/-m-1.5 padding on the <a> to grow the hit box without changing visual size.",
+          "Social icons use text-white/25 on #0b0b0e; contrast is very low until hover (hover accent is desktop-only). Consider text-white/40 as the resting state."
+        ]
+      },
+      {
+        "screen": "Clients carousel (all viewports)",
+        "issues": [
+          "A few owner-supplied logos are dark-on-dark and read as nearly blank tiles (most notably yakuza, and twisteast / papastavrou are faint at the marquee edge fade). Purely cosmetic - the images decode fine."
+        ]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "OPTIONAL (design only): enlarge social icon tap target to >=24px on mobile via padding + negative margin.",
+    "OPTIONAL (design only): raise resting opacity of the social icons from white/25 to ~white/40 for contrast.",
+    "OPTIONAL: consider a lighter/inverted variant for the yakuza logo which is nearly invisible on the dark card."
+  ],
+  "critical_code_review_comments": [
+    "Clients.js SocialRow uses `<span className=\"h-[18px]\" />` as the spacer for handle-less shops - verified it keeps heights identical, but it is an inline element sized only because the parent is flex; adding `block` would make the intent explicit and immune to future layout changes.",
+    "All 50 marquee cards render duplicate <img> tags with loading=lazy; off-screen duplicates never decode until the animation brings them in, which can cause a brief blank tile on slow networks. Consider decoding=async + fetchpriority hints or reusing a sprite.",
+    "backend_test.py count assertion was strict equality and flaked under pytest-xdist parallelism (other workers insert rows). Relaxed to `>= b + 1` (test-only fix, no product change)."
+  ],
+  "updated_files": [
+    "/app/backend/tests/backend_test.py",
+    "/app/frontend/src/components/Contact.js"
+  ],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "seed_data_creation": "Created contact rows via API and UI prefixed TEST_ (TEST_User_*, TEST_NoBiz_*, TEST_Count_*, TEST_QA_Iter3, TEST_QA_Iter3b). No delete endpoint exists, so these remain in the contacts collection by design.",
+  "should_call_test_agent_after_fix": false,
+  "should_main_agent_self_test": true,
+  "test_credentials": "None required - no auth in this app. /app/memory/test_credentials.md exists but is not needed.",
+  "context_for_next_testing_agent": "Iteration 3 is green. Backend: 10 pytest cases in /app/backend/tests/backend_test.py cover GET /api/, POST /api/contact (valid, optional business, 6 invalid payload variants -> 422), GET /api/contact/count increment, and confirmation that GET /api/contact is not exposed (404/405). Frontend testing pattern that works: inject `.marquee{animation:none !important}` via add_style_tag, force `img.loading='eager'`, then de-duplicate cards by data-testid because each marquee row renders items twice. Only 2 changes were made by the test agent: relaxed the flaky count assertion, and added data-testid=\"contact-success\"/\"contact-status\" to the submit button label in Contact.js (the success state previously had no testid). Remaining findings are cosmetic only (15px social icon tap target, white/25 icon contrast, dark yakuza logo).",
+  "rca_of_the_issue": "Only real defect found was a flaky backend test: TestContactCount asserted count == before+1 while pytest-xdist ran TestContactCreate concurrently on another worker, inserting extra rows (observed 3 vs expected 2). Fixed in the test by asserting >= before+1. No application-code defects were found for any of the 11 requested items."
+}

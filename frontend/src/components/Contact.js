@@ -97,7 +97,9 @@ export const Contact = () => {
             className="group mt-8 flex w-full items-center justify-center gap-2.5 rounded-full bg-white px-7 py-4 text-sm font-bold text-black transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-50"
           >
             {done && !busy ? <Check className="h-4 w-4" strokeWidth={3} /> : <Send className="h-4 w-4" strokeWidth={2.4} />}
-            {busy ? t.contact.sending : done ? t.contact.ok : t.contact.send}
+            <span data-testid={done && !busy ? "contact-success" : "contact-status"}>
+              {busy ? t.contact.sending : done ? t.contact.ok : t.contact.send}
+            </span>
           </button>
         </motion.form>
       </div>
