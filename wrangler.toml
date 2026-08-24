@@ -1,5 +1,5 @@
-name = "socialgrowth"
-compatibility_date = "2026-08-23"
+name = "socialgrowthwebsite"
+compatibility_date = "2026-08-24"
 
 [assets]
 directory = "./frontend/build"
