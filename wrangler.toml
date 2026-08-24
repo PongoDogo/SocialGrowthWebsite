@@ -1,0 +1,6 @@
+name = "socialgrowthwebsite"
+compatibility_date = "2026-08-24"
+
+[assets]
+directory = "./frontend/build"
+not_found_handling = "single-page-application"
