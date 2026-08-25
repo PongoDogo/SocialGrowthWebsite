@@ -20,14 +20,21 @@ export const Services = () => {
   const centered = sv.align === "center";
 
   return (
-    <section data-testid="services" id="services" className={`relative ${pad(sv.padding)}`}>
+    <section
+      data-testid="services"
+      id="services"
+      data-sg="section:services"
+      data-sg-kind="section"
+      data-sg-label="Ενότητα: Υπηρεσίες"
+      className={`relative ${pad(sv.padding)}`}
+    >
       {theme.glows !== false && <div className="pointer-events-none absolute right-0 top-1/4 h-[420px] w-[420px] glow-cyan opacity-50" />}
 
       <div className="relative mx-auto px-6 sm:px-8" style={container(theme)}>
         <div className={`max-w-2xl ${headBox(sv.align)}`}>
-          <p className="text-[10px] font-bold uppercase tracking-[0.26em] sm:text-[11px]" style={{ color: accent }}>{L(sv.overline)}</p>
-          <h2 className="mt-4 font-display text-[26px] font-extrabold leading-[1.12] tracking-tight sm:text-4xl lg:text-5xl">{L(sv.title)}</h2>
-          <p className="mt-4 text-[13.5px] leading-relaxed text-white/50 sm:mt-5 sm:text-base lg:text-lg">{L(sv.sub)}</p>
+          <p data-sg="services.overline" data-sg-kind="text" data-sg-label="Μικρός τίτλος" className="text-[10px] font-bold uppercase tracking-[0.26em] sm:text-[11px]" style={{ color: accent }}>{L(sv.overline)}</p>
+          <h2 data-sg="services.title" data-sg-kind="text" data-sg-label="Τίτλος ενότητας" className="mt-4 font-display text-[26px] font-extrabold leading-[1.12] tracking-tight sm:text-4xl lg:text-5xl">{L(sv.title)}</h2>
+          <p data-sg="services.sub" data-sg-kind="text" data-sg-label="Υπότιτλος" className="mt-4 text-[13.5px] leading-relaxed text-white/50 sm:mt-5 sm:text-base lg:text-lg">{L(sv.sub)}</p>
         </div>
 
         <div className={`mt-10 grid gap-4 sm:mt-16 sm:gap-5 ${cols}`}>
@@ -38,6 +45,9 @@ export const Services = () => {
               <motion.article
                 key={s.id || i}
                 data-testid={`service-card-${i}`}
+                data-sg={`services.items.${s._i}`}
+                data-sg-kind="card"
+                data-sg-label={`Κάρτα υπηρεσίας ${i + 1}`}
                 initial={{ opacity: 0, y: 26 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
@@ -59,8 +69,8 @@ export const Services = () => {
                   </div>
                   <span className="font-display text-[11px] font-extrabold tracking-[0.22em] text-white/15">{String(i + 1).padStart(2, "0")}</span>
                 </div>
-                <h3 className="relative mt-6 font-display text-[18px] font-bold tracking-tight sm:text-xl">{L(s.title)}</h3>
-                <p className="relative mt-3 text-[13.5px] leading-relaxed text-white/45 sm:text-sm">{L(s.desc)}</p>
+                <h3 data-sg={`services.items.${s._i}.title`} data-sg-kind="text" data-sg-label="Τίτλος υπηρεσίας" className="relative mt-6 font-display text-[18px] font-bold tracking-tight sm:text-xl">{L(s.title)}</h3>
+                <p data-sg={`services.items.${s._i}.desc`} data-sg-kind="text" data-sg-label="Περιγραφή υπηρεσίας" className="relative mt-3 text-[13.5px] leading-relaxed text-white/45 sm:text-sm">{L(s.desc)}</p>
               </motion.article>
             );
           })}

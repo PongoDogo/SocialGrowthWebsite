@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import * as Icons from "lucide-react";
 import {
   Panel,
@@ -18,6 +18,11 @@ import {
 } from "@/studio/fields";
 import { uid, slugify, move, getIn } from "@/studio/util";
 import { FONTS } from "@/content/style";
+import { BLOCK_TYPES } from "@/components/Blocks";
+import { newBlock, BlockFields } from "@/studio/blocks";
+import { TEMPLATES } from "@/studio/templates";
+
+const BUILTIN = ["hero", "clients", "stats", "services", "process", "contact"];
 
 const TARGETS = [
   { value: "hero", label: "Αρχή (Hero)" },
@@ -121,6 +126,23 @@ export const GeneralEditor = ({ d, set }) => (
 export const ThemeEditor = ({ d, set }) => (
   <div className="space-y-5">
     <Panel title="Χρώματα" hint="Το accent χρησιμοποιείται σε όλους τους μικρούς τίτλους, links και highlights.">
+      <Grid>
+        <Row label="Θέμα" hint="Σε φωτεινό θέμα τα κείμενα γίνονται σκούρα αυτόματα.">
+          <Select
+            value={d.theme?.mode || "dark"}
+            onChange={(v) => set("theme.mode", v)}
+            options={[
+              { value: "dark", label: "Σκούρο" },
+              { value: "light", label: "Φωτεινό" },
+            ]}
+          />
+        </Row>
+        {(d.theme?.mode || "dark") === "light" && (
+          <Row label="Χρώμα κειμένων">
+            <ColorInput value={d.theme?.ink} onChange={(v) => set("theme.ink", v)} />
+          </Row>
+        )}
+      </Grid>
       <Grid>
         <Row label="Accent (κύριο)">
           <ColorInput value={d.theme?.accent} onChange={(v) => set("theme.accent", v)} />
@@ -466,6 +488,25 @@ export const ClientsEditor = ({ d, set }) => (
       <Row label="Ταχύτητα" hint="Μικρότερος αριθμός = πιο γρήγορη κίνηση (δευτερόλεπτα ανά γύρο).">
         <Slider value={d.clients?.speed || 54} onChange={(v) => set("clients.speed", v)} min={15} max={140} suffix="s" />
       </Row>
+      <Grid>
+        <Row label="Κενό ανάμεσα στις κάρτες">
+          <Slider value={d.clients?.gap ?? 20} onChange={(v) => set("clients.gap", v)} min={0} max={60} suffix="px" />
+        </Row>
+        <Row label="Σβήσιμο στις άκρες" hint="0 = οι κάρτες φτάνουν κολλητά στην άκρη χωρίς fade.">
+          <Slider value={d.clients?.fadeEdges ?? 7} onChange={(v) => set("clients.fadeEdges", v)} min={0} max={22} suffix="%" />
+        </Row>
+      </Grid>
+      <Row label="Πλακάκια λογοτύπων" hint="Σκούρα πλακάκια κρατούν ορατά τα λευκά λογότυπα σε φωτεινό θέμα.">
+        <Select
+          value={d.clients?.logoTiles || "auto"}
+          onChange={(v) => set("clients.logoTiles", v)}
+          options={[
+            { value: "auto", label: "Αυτόματα (σκούρα σε φωτεινό θέμα)" },
+            { value: "on", label: "Πάντα σκούρα" },
+            { value: "off", label: "Πάντα σαν το θέμα" },
+          ]}
+        />
+      </Row>
       <Toggle value={d.clients?.pauseOnHover !== false} onChange={(v) => set("clients.pauseOnHover", v)} label="Πάγωμα στο hover" />
       <Toggle value={d.clients?.showNames !== false} onChange={(v) => set("clients.showNames", v)} label="Εμφάνιση ονομάτων" />
       <Toggle value={d.clients?.showSocials !== false} onChange={(v) => set("clients.showSocials", v)} label="Εμφάνιση social εικονιδίων" />
@@ -710,54 +751,274 @@ export const FooterEditor = ({ d, set }) => (
   </Panel>
 );
 
-/* ================================================================= Layout */
+/* ================================================================= Layout & blocks */
+const SectionRow = ({ title, subtitle, hidden, onToggle, onUp, onDown, first, last, onDrag, children, extra, testId }) => (
+  <div className={`rounded-xl border bg-white/[0.02] transition-colors ${children ? "border-[#60d6ff]/40" : "border-white/10"}`} {...onDrag} data-testid={testId}>
+    <div className="flex items-center gap-2 px-3 py-2.5">
+      <Icons.GripVertical className="h-4 w-4 shrink-0 cursor-grab text-white/25" />
+      <div className="min-w-0 flex-1">
+        <p className={`truncate text-[13px] font-semibold ${hidden ? "text-white/30 line-through" : "text-white/85"}`}>{title}</p>
+        {subtitle && <p className="mt-0.5 truncate text-[11px] text-white/35">{subtitle}</p>}
+      </div>
+      {extra}
+      <button type="button" onClick={onToggle} title={hidden ? "Εμφάνιση" : "Κρύψιμο"} className="rounded-lg p-1.5 text-white/40 hover:bg-white/10 hover:text-white">
+        {hidden ? <Icons.EyeOff className="h-4 w-4" /> : <Icons.Eye className="h-4 w-4" />}
+      </button>
+      <button type="button" title="Πιο πάνω" data-testid="layout-move-up" onClick={onUp} disabled={first} className="rounded-lg p-1.5 text-white/40 hover:text-white disabled:opacity-20">
+        <Icons.ChevronUp className="h-4 w-4" />
+      </button>
+      <button type="button" title="Πιο κάτω" data-testid="layout-move-down" onClick={onDown} disabled={last} className="rounded-lg p-1.5 text-white/40 hover:text-white disabled:opacity-20">
+        <Icons.ChevronDown className="h-4 w-4" />
+      </button>
+    </div>
+    {children && <div className="border-t border-white/[0.07] px-4 py-4">{children}</div>}
+  </div>
+);
+
 export const LayoutEditor = ({ d, set }) => {
-  const all = ["hero", "clients", "stats", "services", "process", "contact"];
-  const order = (Array.isArray(d.layout?.order) && d.layout.order.length ? d.layout.order : all).filter((s) => all.includes(s));
-  const missing = all.filter((s) => !order.includes(s));
-  const full = [...order, ...missing];
+  const [openId, setOpenId] = useState(null);
+  const [adding, setAdding] = useState(false);
+  const dragIdx = React.useRef(null);
+
+  const blocks = Array.isArray(d.blocks) ? d.blocks : [];
+  const known = [...BUILTIN, ...blocks.map((b) => `block:${b.id}`)];
+  const stored = (Array.isArray(d.layout?.order) ? d.layout.order : []).filter((id) => known.includes(id));
+  const full = [...stored, ...known.filter((id) => !stored.includes(id))];
   const hidden = Array.isArray(d.layout?.hidden) ? d.layout.hidden : [];
 
   const swap = (i, j) => {
     if (j < 0 || j >= full.length) return;
     set("layout.order", move(full, i, j));
   };
+  const toggle = (id) => set("layout.hidden", hidden.includes(id) ? hidden.filter((x) => x !== id) : [...hidden, id]);
+
+  const addBlock = (type) => {
+    const b = newBlock(type);
+    set("blocks", [...blocks, b]);
+    set("layout.order", [...full, `block:${b.id}`]);
+    setAdding(false);
+    setOpenId(`block:${b.id}`);
+  };
+
+  const removeBlock = (id) => {
+    if (!window.confirm("Να διαγραφεί αυτή η ενότητα;")) return;
+    set("blocks", blocks.filter((b) => b.id !== id));
+    set("layout.order", full.filter((x) => x !== `block:${id}`));
+    setOpenId(null);
+  };
+
+  const duplicateBlock = (id) => {
+    const src = blocks.find((b) => b.id === id);
+    if (!src) return;
+    const copy = JSON.parse(JSON.stringify(src));
+    copy.id = uid("b");
+    const at = full.indexOf(`block:${id}`);
+    set("blocks", [...blocks, copy]);
+    set("layout.order", [...full.slice(0, at + 1), `block:${copy.id}`, ...full.slice(at + 1)]);
+    setOpenId(`block:${copy.id}`);
+  };
 
   return (
-    <Panel title="Σειρά & εμφάνιση ενοτήτων" hint="Άλλαξε τη σειρά με τα βελάκια ή κρύψε μια ολόκληρη ενότητα.">
-      <div className="space-y-2.5">
-        {full.map((s, i) => {
-          const isHidden = hidden.includes(s);
-          return (
-            <div key={s} className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2.5">
-              <span className="w-6 text-[11px] font-extrabold tabular-nums text-white/25">{String(i + 1).padStart(2, "0")}</span>
-              <span className={`flex-1 text-[13px] font-semibold ${isHidden ? "text-white/30 line-through" : "text-white/85"}`}>
-                {SECTION_LABELS[s] || s}
-              </span>
-              <button
-                type="button"
-                onClick={() => set("layout.hidden", isHidden ? hidden.filter((x) => x !== s) : [...hidden, s])}
-                className="rounded-lg p-1.5 text-white/40 hover:bg-white/10 hover:text-white"
-                title={isHidden ? "Εμφάνιση" : "Κρύψιμο"}
+    <div className="space-y-5">
+      <Panel
+        title="Ενότητες του site"
+        hint="Σύρε ή χρησιμοποίησε τα βελάκια για τη σειρά. Πάτα το μάτι για να κρύψεις μια ενότητα."
+      >
+        <div className="space-y-2.5">
+          {full.map((id, i) => {
+            const isBlock = id.startsWith("block:");
+            const block = isBlock ? blocks.find((b) => b.id === id.slice(6)) : null;
+            const meta = block ? BLOCK_TYPES.find((t) => t.type === block.type) : null;
+            const index = block ? blocks.findIndex((b) => b.id === block.id) : -1;
+            const open = openId === id;
+            return (
+              <SectionRow
+                key={id}
+                testId={`layout-row-${id}`}
+                title={isBlock ? `${meta?.label || block?.type || "Ενότητα"}${block?.props?.title?.el ? ` — ${block.props.title.el}` : ""}` : SECTION_LABELS[id] || id}
+                subtitle={isBlock ? "Δική σου ενότητα" : "Βασική ενότητα"}
+                hidden={hidden.includes(id)}
+                onToggle={() => toggle(id)}
+                onUp={() => swap(i, i - 1)}
+                onDown={() => swap(i, i + 1)}
+                first={i === 0}
+                last={i === full.length - 1}
+                onDrag={{
+                  draggable: true,
+                  onDragStart: () => { dragIdx.current = i; },
+                  onDragOver: (e) => e.preventDefault(),
+                  onDrop: () => {
+                    if (dragIdx.current === null || dragIdx.current === i) return;
+                    set("layout.order", move(full, dragIdx.current, i));
+                    dragIdx.current = null;
+                  },
+                }}
+                extra={
+                  <>
+                    <button
+                      type="button"
+                      title="Ρυθμίσεις"
+                      onClick={() => setOpenId(open ? null : id)}
+                      className="rounded-lg p-1.5 text-white/40 hover:bg-white/10 hover:text-white"
+                    >
+                      <Icons.SlidersHorizontal className="h-3.5 w-3.5" />
+                    </button>
+                    {isBlock && (
+                      <>
+                        <button type="button" title="Αντίγραφο" onClick={() => duplicateBlock(block.id)} className="rounded-lg p-1.5 text-white/40 hover:bg-white/10 hover:text-white">
+                          <Icons.Copy className="h-3.5 w-3.5" />
+                        </button>
+                        <button type="button" title="Διαγραφή" onClick={() => removeBlock(block.id)} className="rounded-lg p-1.5 text-white/40 hover:bg-red-500/15 hover:text-red-300">
+                          <Icons.Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </>
+                    )}
+                  </>
+                }
               >
-                {isHidden ? <Icons.EyeOff className="h-4 w-4" /> : <Icons.Eye className="h-4 w-4" />}
-              </button>
-              <button type="button" onClick={() => swap(i, i - 1)} disabled={i === 0} className="rounded-lg p-1.5 text-white/40 hover:text-white disabled:opacity-20">
-                <Icons.ChevronUp className="h-4 w-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => swap(i, i + 1)}
-                disabled={i === full.length - 1}
-                className="rounded-lg p-1.5 text-white/40 hover:text-white disabled:opacity-20"
-              >
-                <Icons.ChevronDown className="h-4 w-4" />
+                {open &&
+                  (isBlock && block ? (
+                    <BlockFields block={block} index={index} d={d} set={set} />
+                  ) : (
+                    <p className="text-[12.5px] leading-relaxed text-white/45">
+                      Οι ρυθμίσεις της ενότητας «{SECTION_LABELS[id] || id}» βρίσκονται στο αντίστοιχο μενού αριστερά
+                      (ή πάτα το στοιχείο μέσα στο preview).
+                    </p>
+                  ))}
+              </SectionRow>
+            );
+          })}
+        </div>
+
+        {adding ? (
+          <div className="rounded-xl border border-[#60d6ff]/40 bg-white/[0.02] p-3.5">
+            <div className="mb-3 flex items-center justify-between">
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/50">Διάλεξε τύπο ενότητας</p>
+              <button type="button" onClick={() => setAdding(false)} className="rounded-lg p-1 text-white/40 hover:text-white">
+                <Icons.X className="h-4 w-4" />
               </button>
             </div>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {BLOCK_TYPES.map((t) => {
+                const I = Icons[t.icon] || Icons.Square;
+                return (
+                  <button
+                    key={t.type}
+                    type="button"
+                    data-testid={`add-block-${t.type}`}
+                    onClick={() => addBlock(t.type)}
+                    className="rounded-xl border border-white/10 p-3 text-left transition-colors hover:border-[#60d6ff]/60"
+                  >
+                    <I className="h-4 w-4 text-[#60d6ff]" />
+                    <p className="mt-2 text-[12.5px] font-bold text-white/85">{t.label}</p>
+                    <p className="mt-0.5 text-[10.5px] leading-snug text-white/35">{t.hint}</p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ) : (
+          <button
+            type="button"
+            data-testid="add-section"
+            onClick={() => setAdding(true)}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-white/20 py-3 text-[12.5px] font-bold text-white/60 transition-colors hover:border-[#60d6ff]/60 hover:text-white"
+          >
+            <Icons.Plus className="h-4 w-4" />
+            Πρόσθεσε νέα ενότητα
+          </button>
+        )}
+      </Panel>
+
+      <Panel title="Μπάρα & Footer" hint="Μπορείς να κρύψεις τελείως τη μπάρα πλοήγησης ή το footer.">
+        <Toggle value={!hidden.includes("nav")} onChange={() => toggle("nav")} label="Εμφάνιση μπάρας πλοήγησης" />
+        <Toggle value={!hidden.includes("footer")} onChange={() => toggle("footer")} label="Εμφάνιση footer" />
+      </Panel>
+    </div>
+  );
+};
+
+/* ================================================================= Templates */
+export const TemplatesEditor = ({ d, onApply, onUndo, canUndo, onResetStyle, onClearStyles }) => {
+  const styleKeys = Object.keys(d.styles || {}).filter((k) => {
+    const s = d.styles[k] || {};
+    return Object.keys(s.d || {}).length || Object.keys(s.m || {}).length;
+  });
+  return (
+    <div className="space-y-5">
+    <Panel
+      title="Έτοιμα looks"
+      hint="Αλλάζει μόνο την εμφάνιση (χρώματα, γραμματοσειρές, σχήματα). Τα κείμενα, τα μαγαζιά και οι εικόνες σου μένουν ως έχουν."
+      right={
+        canUndo ? (
+          <button type="button" data-testid="template-undo" onClick={onUndo} className="rounded-lg border border-white/15 px-3 py-1.5 text-[12px] font-semibold text-white/75 hover:border-white/35">
+            Αναίρεση
+          </button>
+        ) : null
+      }
+    >
+      <div className="grid gap-3 sm:grid-cols-2">
+        {TEMPLATES.map((t) => {
+          const active = (d.theme?.accent || "").toLowerCase() === (t.patch["theme.accent"] || "").toLowerCase();
+          return (
+            <button
+              key={t.id}
+              type="button"
+              data-testid={`template-${t.id}`}
+              onClick={() => onApply(t)}
+              className={`rounded-2xl border p-4 text-left transition-colors ${active ? "border-[#60d6ff]/60 bg-[#60d6ff]/[0.06]" : "border-white/10 hover:border-white/30"}`}
+            >
+              <div className="flex items-center gap-1.5">
+                {t.swatch.map((c) => (
+                  <span key={c} className="h-5 w-5 rounded-full border border-white/15" style={{ backgroundColor: c }} />
+                ))}
+                {active && <Icons.Check className="ml-auto h-4 w-4 text-[#60d6ff]" />}
+              </div>
+              <p className="mt-3 font-display text-[14px] font-bold tracking-tight text-white">{t.name}</p>
+              <p className="mt-1 text-[11.5px] leading-relaxed text-white/40">{t.desc}</p>
+            </button>
           );
         })}
       </div>
     </Panel>
+
+    <Panel
+      title={`Προσαρμοσμένα στυλ (${styleKeys.length})`}
+      hint="Ό,τι έχεις αλλάξει χειροκίνητα σε συγκεκριμένα στοιχεία (θέση, μέγεθος, χρώμα)."
+      right={
+        styleKeys.length ? (
+          <button
+            type="button"
+            data-testid="clear-all-styles"
+            onClick={() => {
+              if (window.confirm("Να καθαριστούν ΟΛΑ τα προσαρμοσμένα στυλ στοιχείων;")) onClearStyles();
+            }}
+            className="rounded-lg border border-red-500/30 px-3 py-1.5 text-[12px] font-semibold text-red-300/80 hover:border-red-500/60"
+          >
+            Καθάρισε όλα
+          </button>
+        ) : null
+      }
+    >
+      {styleKeys.length ? (
+        <div className="space-y-2">
+          {styleKeys.map((k) => (
+            <div key={k} className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2.5">
+              <Icons.Wand2 className="h-3.5 w-3.5 shrink-0 text-[#60d6ff]" />
+              <span className="min-w-0 flex-1 truncate text-[12.5px] font-medium text-white/70">{k}</span>
+              <button type="button" title="Επαναφορά" onClick={() => onResetStyle(k)} className="rounded-lg p-1.5 text-white/40 hover:bg-red-500/15 hover:text-red-300">
+                <Icons.RotateCcw className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="rounded-xl border border-dashed border-white/12 py-6 text-center text-[12.5px] text-white/35">
+          Καμία χειροκίνητη αλλαγή ακόμα — πάτα ένα στοιχείο στο preview για να ξεκινήσεις.
+        </p>
+      )}
+    </Panel>
+  </div>
   );
 };
 

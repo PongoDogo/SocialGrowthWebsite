@@ -1,61 +1,87 @@
-# SocialGrowth — PRD
+# SocialGrowth — PRD & working memory
 
-## Original problem statement
-Greek user wants a website for their agency that advertises shops/companies and produces videos for TikTok, Instagram, Facebook and YouTube. It must showcase all shops they have worked with in a smooth premium moving carousel. Design must be modern, fancy, professional, premium, clean, minimal, not chaotic, with the logo top-left.
+_Last updated: 25 Jun 2026_
 
-Company: **SocialGrowth** · Email: **socialstartupagency@gmail.com** · Logo supplied by user (glossy 3D blue arrow + glass spheres).
+## 1. Product
+Premium bilingual (EL/EN) one-page agency site for **SocialGrowth** (short-form video / social media agency, Greece)
+plus a private **Studio** (admin panel) at `/studio` where the owner edits the whole site without code.
 
-## User choices
-- Bilingual: Greek (default) + English switcher
-- Dark premium theme
-- Contact form must really send email to socialstartupagency@gmail.com
-- Sections: Services + Clients + Contact + animated scroll-triggered stats counter (100M+ views)
+Stack: React 19 (CRA, Tailwind, shadcn, framer-motion) · FastAPI · MongoDB · deployed via Render/Cloudflare.
+Contact form emails go out through formsubmit.co. Nothing is live until **Δημοσίευση** (draft → published model).
 
-## Architecture
-- React 19 (CRA + craco), Tailwind, framer-motion, sonner. Single-page sections.
-- FastAPI backend, MongoDB (`contacts` collection), email delivery via formsubmit.co AJAX endpoint.
-- `src/i18n.js` holds all EL/EN copy + LangProvider context. `src/data/clients.js` holds the 28 clients.
-- Client logos rendered as icon + typography cards (lucide-react) — guarantees zero deadspace / clean corners.
+### Hard rules for every agent
+- This is a **live client project**. Make only what the user asks; never refactor architecture, auth, deployment,
+  `.env` or unrelated files.
+- Public site reads `GET /api/content` (published). Studio edits the **draft** (`/api/admin/*`).
+- Any draft change made while testing must end with `POST /api/admin/discard`.
+- Studio password lives in `/app/memory/test_credentials.md`.
 
-## Implemented (2026-06)
-- Sticky glass navbar, logo top-left (transparent PNG derived from user asset), EL/EN switcher, mobile menu
-- Hero with floating 3D logo, platform row (custom inline brand SVGs), full-width CTAs on mobile
-- Clients carousel sits directly under the hero: 3 marquee rows, alternating directions/speeds, pause on hover,
-  edge fade, per-card accent glow + lift. **25 clients, every one with its real logo.**
-  Under each logo: the shop name (links to its site when one exists) + small Instagram / TikTok / Facebook icons
-  for the shops where a real handle was verified.
-- Logo pipeline: `/app/scripts/fetch_logos.py` (scrapes the clients' own sites) and
-  `/app/scripts/process_uploaded_logos.py` (owner-supplied files) — auto trim, white/black background removal,
-  rounded tiles for artwork that keeps its own background, recolour/lighten/brighten so every mark reads on dark.
-- Social handles were harvested from the clients' own websites via `/app/scripts/find_socials.py`.
-- Redesigned Stats section: 4 cards with 01–04 index, animated accent bar + progress line, per-card glow,
-  scroll-triggered counters (100M+ views, clients count derived from CLIENTS.length, 1,200+ videos, 4 platforms)
-- Services bento grid (6), Process (4 steps), Contact form → `POST /api/contact` (Mongo persist + real email), footer
-- Backend: `GET /api/`, `POST /api/contact`, `GET /api/contact/count`
-- Removed on request: Caravel, Cofis, Kemal. Renamed: Nadu Clothing → Nadu Men, Scorpios Bar → Scorpios Music Club.
+## 2. Architecture
+```
+/app/backend
+  server.py            FastAPI app, /api router, contact endpoint
+  admin.py             Studio auth (single password + JWT), content draft/publish, media, inbox, revisions
+  default_content.py   DEFAULT_CONTENT tree (single source of truth for defaults)
+  db.py                Mongo client (MONGO_URL, DB_NAME)
+/app/frontend/src
+  PublicSite.js        renders navbar + ordered sections + custom blocks + footer
+  content/
+    ContentContext.js  fetches published content, or receives draft via postMessage in preview mode
+    style.js           theme helpers (container/pad/cardStyle/primaryBtn/FONTS/useThemeSetup)
+    SectionShell.js    visibleItems() (adds `_i` original index) + sectionOrder() (incl. "block:<id>")
+    StyleOverrides.js  content.styles  ->  real CSS ([data-sg="path"] + mobile media query + light-mode ink remap)
+    PreviewBridge.js   inside preview iframe: hover outline, click-to-select, drag-to-move (postMessage)
+  components/
+    Marquee.jsx        rAF marquee engine (seamless, eased hover pause, constant px/s)
+    Clients.js         carousel rows, logo preload, dark logo tiles
+    Blocks.jsx         12 custom block types + embedFor() (TikTok/IG/YouTube/Vimeo/mp4)
+    Hero/Navbar/Stats/Services/Process/Contact/Footer
+  studio/
+    Studio.jsx         shell: nav, autosave, publish, device/lang, edit-mode, selection, preview bridge
+    Inspector.jsx      selected element: quick content edit + item actions + StyleEditor
+    styleFields.jsx    StyleEditor (desktop/mobile tabs, position, typography, colours, spacing, border)
+    Editors.jsx        per-section editors + LayoutEditor (sections & blocks) + TemplatesEditor
+    blocks.jsx         newBlock() factory + per-type block fields
+    templates.js       6 appearance-only templates
+    Panels.jsx         overview / inbox / media / history / settings
+/app/scripts/sync_defaults.py   regenerates frontend/src/content/defaults.json from backend defaults
+```
 
-## Environment recovery (2025-07)
-- Both `.env` files were MISSING (backend crashed with `KeyError: 'MONGO_URL'`, frontend had no
-  `REACT_APP_BACKEND_URL`) and `node_modules/acorn-globals` had a broken symlink blocking `yarn install`.
-- Recreated `backend/.env` (MONGO_URL, DB_NAME=socialgrowth, CORS_ORIGINS, CONTACT_EMAIL) and
-  `frontend/.env` (REACT_APP_BACKEND_URL, WDS_SOCKET_PORT=443). No product code changed.
-- Full regression PASSED: backend 10/10 (health, contact create + 5 validation cases, count, CORS, Mongo persist),
-  frontend all sections at 1920x900 and 390x844 — 0 console errors, 25/25 client logos load, EL/EN switcher,
-  stats counters (100M+, 25+, 1,200+, 4), contact form success toast, no horizontal overflow.
-- formsubmit.co activation is DONE: `email_delivered: true` — contact emails really reach
-  socialstartupagency@gmail.com.
+### Editable-element contract (`data-sg`)
+Every editable element carries `data-sg="<content path>"`, `data-sg-kind="text|button|image|number|card|box|section"`,
+`data-sg-label="<greek label>"`. Sections use `data-sg="section:<id>"`.
+`content.styles` is a **flat map keyed by that path** (dots inside the key), each with `d` (desktop) and `m` (mobile)
+overrides — so style setters must use array paths: `setIn(d, ["styles", path, dev, key], v)`.
 
-## Backlog
-- P1: Social handles still missing for funkytokyo, yakuza, twisteast, ildesto, doncarlito
-- P1: Portfolio/Videos section embedding real TikTok/Instagram/YouTube reels
-- P2: Testimonials, per-client case study pages, SEO/OG images, admin inbox for submissions
-- P2: Persistent inline error state on the contact form (currently only a sonner toast)
+## 3. Implemented
+### Jun 2026 — carousel rebuild (bug fix)
+- `Marquee.jsx`: measures one set, clones enough copies for any viewport → **never runs out / no gaps**;
+  rAF transform with constant px/second on every row; eased pause & resume on hover; pauses off-screen and on hidden tab.
+- All client logos are **preloaded and eager** (no lazy pop-in); extra vertical padding so hover lift/glow is not clipped.
+- New Studio controls: gap between cards, edge-fade width (0 = hard edge), logo tiles (auto/always dark/theme).
 
-## Logo / social research notes (2026-06)
-- Logo pipeline scripts: `fetch_logos.py` (client sites), `process_uploaded_logos.py` (owner files:
-  flood-fill bg removal that preserves interior whites, circle masking to kill outer frames,
-  rounded tiles with margin trim, brightness/contrast lift), `find_socials.py`, `probe.py`.
-- Verified sites: crats.gr, blysscafe.gr, papastavroushops.gr, tocashop.gr, ovegan269.gr, kiboko.gr,
-  arawsupermarket.gr, hairway.gr, kantinarxis.gr, onedeal.gr, 50ways.com.gr, tolissweets.gr, nadu-men.gr,
-  plus Wolt pages for Guru of Taste, Υπουργείο Γεύσεων and Μπαρμπαθύμιος.
-- Navbar desktop breakpoint is `lg` (1024px); below that the hamburger menu carries the CTA.
+### Jun 2026 — Studio becomes a real website editor
+- **Click-to-edit**: click any element inside the preview → inspector opens with its text/image/number field.
+- **Drag-to-move** in the preview + X/Y sliders, **per device** (desktop / mobile).
+- **Style inspector** per element: size, weight, letter-spacing, line-height, transform, font, colours, opacity,
+  margins/padding, max-width, radius, border, shadow, z-index, hide-on-device, rotate, scale. Reset per element or all.
+- **Sections & blocks**: drag/arrow reorder, hide/show (incl. navbar & footer), duplicate, delete, and **add new
+  sections** — 12 block types: text, icon cards, image, gallery, videos/reels (TikTok/IG/YouTube/Vimeo/mp4), CTA banner,
+  FAQ, testimonials, pricing, logos, spacer, divider. Empty blocks stay hidden on the live site.
+- **Templates**: Dark Premium, Minimal Light, Neon Night, Editorial Gold, Warm Sunset, Mono Brutalist —
+  appearance only (texts/clients/images untouched) with one-click **Αναίρεση**. Light themes remap the
+  white-on-dark utilities to a chosen ink colour.
+- Backend: `theme.mode`/`theme.ink`, `clients.gap`, `clients.fadeEdges`, `clients.logoTiles`, root `blocks: []`
+  and `styles: {}` added to defaults; `dirty` now compares merged trees (no more false "unpublished changes").
+- Verified by testing agent (iteration_8): backend 26/26, all requested Studio + carousel flows pass.
+
+### Earlier
+- Bilingual site, Studio with content editing, media library, inbox, revisions/history, theme & fonts, SEO fields.
+
+## 4. Backlog
+- **P1** Missing social handles for funkytokyo, yakuza, twisteast, ildesto, doncarlito.
+- **P1** Real portfolio content: fill a Videos/Reels block with the actual TikTok/IG reels.
+- **P2** Light-artwork client logos: optional per-client "invert in light theme" flag.
+- **P2** `process_image()` runs sync inside the async upload handler → move to a threadpool for big uploads.
+- **P2** Section-level presets (e.g. hero variants) and saving a user's own template.
+- **P3** Multi-page support (currently one page + anchors).

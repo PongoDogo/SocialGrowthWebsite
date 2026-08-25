@@ -9,12 +9,12 @@ import { container, pad, headBox, cardStyle, primaryBtn, btnIcons } from "@/cont
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-const Field = ({ label, testId, accent, ...rest }) => {
+const Field = ({ label, testId, accent, sgPath, ...rest }) => {
   const base =
     "w-full rounded-2xl bg-white/[0.03] px-5 py-4 text-sm text-white placeholder-white/20 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1)] transition-shadow duration-300 focus:shadow-[inset_0_0_0_1px_rgba(96,214,255,0.6)]";
   return (
     <label className="block">
-      <span className="mb-2.5 block text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">{label}</span>
+      <span data-sg={sgPath} data-sg-kind="text" data-sg-label="Ετικέτα πεδίου" className="mb-2.5 block text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">{label}</span>
       {rest.rows ? (
         <textarea data-testid={testId} {...rest} className={`${base} resize-none`} />
       ) : (
@@ -62,7 +62,14 @@ export const Contact = () => {
   };
 
   return (
-    <section data-testid="contact" id="contact" className={`relative overflow-hidden ${pad(ct.padding)}`}>
+    <section
+      data-testid="contact"
+      id="contact"
+      data-sg="section:contact"
+      data-sg-kind="section"
+      data-sg-label="Ενότητα: Επικοινωνία"
+      className={`relative overflow-hidden ${pad(ct.padding)}`}
+    >
       {theme.glows !== false && <div className="pointer-events-none absolute -right-24 top-10 h-[480px] w-[480px] glow-blue opacity-70" />}
 
       <div
@@ -70,9 +77,9 @@ export const Contact = () => {
         style={container(theme)}
       >
         <div className={`${formLeft ? "lg:order-2" : ""} ${headBox(ct.align)}`}>
-          <p className="text-[10px] font-bold uppercase tracking-[0.26em] sm:text-[11px]" style={{ color: accent }}>{L(ct.overline)}</p>
-          <h2 className="mt-4 font-display text-[26px] font-extrabold leading-[1.12] tracking-tight sm:text-4xl lg:text-5xl">{L(ct.title)}</h2>
-          <p className="mt-4 text-[13.5px] leading-relaxed text-white/50 sm:mt-5 sm:text-base lg:text-lg">{L(ct.sub)}</p>
+          <p data-sg="contact.overline" data-sg-kind="text" data-sg-label="Μικρός τίτλος" className="text-[10px] font-bold uppercase tracking-[0.26em] sm:text-[11px]" style={{ color: accent }}>{L(ct.overline)}</p>
+          <h2 data-sg="contact.title" data-sg-kind="text" data-sg-label="Τίτλος ενότητας" className="mt-4 font-display text-[26px] font-extrabold leading-[1.12] tracking-tight sm:text-4xl lg:text-5xl">{L(ct.title)}</h2>
+          <p data-sg="contact.sub" data-sg-kind="text" data-sg-label="Υπότιτλος" className="mt-4 text-[13.5px] leading-relaxed text-white/50 sm:mt-5 sm:text-base lg:text-lg">{L(ct.sub)}</p>
 
           {ct.showEmail !== false && email && (
             <a
@@ -87,7 +94,7 @@ export const Contact = () => {
 
           <ul className={`mt-8 space-y-3.5 sm:mt-10 ${ct.align === "center" ? "inline-block text-left" : ""}`}>
             {(Array.isArray(ct.points) ? ct.points : []).map((p, i) => (
-              <li key={i} data-testid={`contact-point-${i}`} className="flex items-center gap-3">
+              <li key={i} data-testid={`contact-point-${i}`} data-sg={`contact.points.${i}`} data-sg-kind="text" data-sg-label={`Σημείο ${i + 1}`} className="flex items-center gap-3">
                 <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full" style={{ backgroundColor: `${accent}1f` }}>
                   <Check className="h-3 w-3" strokeWidth={3} style={{ color: accent }} />
                 </span>
@@ -99,6 +106,9 @@ export const Contact = () => {
 
         <motion.form
           data-testid="contact-form"
+          data-sg="contact.form"
+          data-sg-kind="box"
+          data-sg-label="Κάρτα φόρμας"
           onSubmit={submit}
           initial={{ opacity: 0, y: 28 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -108,14 +118,14 @@ export const Contact = () => {
           style={cardStyle(theme)}
         >
           <div className="grid gap-4 sm:grid-cols-2 sm:gap-5">
-            <Field label={L(lb.name)} testId="contact-name" value={form.name} onChange={set("name")} required placeholder="—" />
-            <Field label={L(lb.email)} testId="contact-email" type="email" value={form.email} onChange={set("email")} required placeholder="—" />
+            <Field label={L(lb.name)} sgPath="contact.labels.name" testId="contact-name" value={form.name} onChange={set("name")} required placeholder="—" />
+            <Field label={L(lb.email)} sgPath="contact.labels.email" testId="contact-email" type="email" value={form.email} onChange={set("email")} required placeholder="—" />
           </div>
           <div className="mt-4 sm:mt-5">
-            <Field label={L(lb.business)} testId="contact-business" value={form.business} onChange={set("business")} placeholder="—" />
+            <Field label={L(lb.business)} sgPath="contact.labels.business" testId="contact-business" value={form.business} onChange={set("business")} placeholder="—" />
           </div>
           <div className="mt-4 sm:mt-5">
-            <Field label={L(lb.message)} testId="contact-message" rows={5} value={form.message} onChange={set("message")} required placeholder="—" />
+            <Field label={L(lb.message)} sgPath="contact.labels.message" testId="contact-message" rows={5} value={form.message} onChange={set("message")} required placeholder="—" />
           </div>
 
           {state === "err" && (
@@ -124,7 +134,7 @@ export const Contact = () => {
             </p>
           )}
 
-          <button data-testid="contact-submit" type="submit" disabled={busy} className={`mt-7 w-full sm:mt-8 ${pb.className} disabled:opacity-50`} style={pb.style}>
+          <button data-testid="contact-submit" data-sg="contact.labels.send" data-sg-kind="button" data-sg-label="Κουμπί αποστολής" type="submit" disabled={busy} className={`mt-7 w-full sm:mt-8 ${pb.className} disabled:opacity-50`} style={pb.style}>
             {btnIcons(theme) && (state === "ok" && !busy ? <Check className="h-4 w-4" strokeWidth={3} /> : <Send className="h-4 w-4" strokeWidth={2.4} />)}
             {busy ? L(lb.sending) : state === "ok" ? L(lb.ok) : L(lb.send)}
           </button>

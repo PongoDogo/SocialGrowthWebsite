@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { api, getToken, setToken, clearToken } from "@/studio/api";
 import { setIn } from "@/studio/util";
 import { EditLangContext } from "@/studio/fields";
+import { Inspector } from "@/studio/Inspector";
 import {
   GeneralEditor,
   ThemeEditor,
@@ -16,12 +17,14 @@ import {
   ContactEditor,
   FooterEditor,
   LayoutEditor,
+  TemplatesEditor,
   DesignEditor,
 } from "@/studio/Editors";
 import { OverviewPanel, InboxPanel, MediaPanel, HistoryPanel, SettingsPanel } from "@/studio/Panels";
 
 const NAV = [
   { id: "overview", label: "Σύνοψη", icon: "LayoutDashboard", group: "start" },
+  { id: "layout", label: "Ενότητες & blocks", icon: "Layers", group: "start" },
   { id: "general", label: "Ταυτότητα & SEO", icon: "Building2", group: "content" },
   { id: "nav", label: "Μενού πλοήγησης", icon: "Menu", group: "content" },
   { id: "hero", label: "Αρχή (Hero)", icon: "Sparkles", group: "content" },
@@ -31,7 +34,7 @@ const NAV = [
   { id: "process", label: "Πώς δουλεύουμε", icon: "ListOrdered", group: "content" },
   { id: "contact", label: "Επικοινωνία", icon: "Mail", group: "content" },
   { id: "footer", label: "Footer", icon: "PanelBottom", group: "content" },
-  { id: "layout", label: "Σειρά ενοτήτων", icon: "MoveVertical", group: "design" },
+  { id: "templates", label: "Έτοιμα looks", icon: "Wand2", group: "design" },
   { id: "theme", label: "Χρώματα & φόντο", icon: "Palette", group: "design" },
   { id: "design", label: "Γραμματοσειρές & κουμπιά", icon: "Type", group: "design" },
   { id: "inbox", label: "Μηνύματα", icon: "Inbox", group: "manage" },
@@ -121,49 +124,50 @@ const Login = ({ onDone }) => {
 };
 
 /* ================================================================= Preview */
-const Preview = ({ draft, lang, device }) => {
+const Preview = ({ draft, lang, device, editMode, selected, onSelect, onMove, scrollTo }) => {
   const ref = useRef(null);
-  const readyRef = useRef(false);
+  const state = useRef({});
+  state.current = { draft, lang, device, editMode, selected };
 
-  const post = useCallback(
-    (content) => {
-      try {
-        ref.current?.contentWindow?.postMessage({ type: "sg-preview-content", content }, "*");
-      } catch {
-        /* ignore */
-      }
-    },
-    []
-  );
-
-  useEffect(() => {
-    const onMsg = (e) => {
-      if (e?.data?.type === "sg-preview-ready") {
-        readyRef.current = true;
-        post(draft);
-        try {
-          ref.current?.contentWindow?.postMessage({ type: "sg-preview-lang", lang }, "*");
-        } catch {
-          /* ignore */
-        }
-      }
-    };
-    window.addEventListener("message", onMsg);
-    return () => window.removeEventListener("message", onMsg);
-  }, [draft, lang, post]);
-
-  useEffect(() => {
-    const t = setTimeout(() => post(draft), 140);
-    return () => clearTimeout(t);
-  }, [draft, post]);
-
-  useEffect(() => {
+  const post = useCallback((msg) => {
     try {
-      ref.current?.contentWindow?.postMessage({ type: "sg-preview-lang", lang }, "*");
+      ref.current?.contentWindow?.postMessage(msg, "*");
     } catch {
       /* ignore */
     }
-  }, [lang]);
+  }, []);
+
+  useEffect(() => {
+    const onMsg = (e) => {
+      const m = e?.data;
+      if (!m || typeof m !== "object") return;
+      if (m.type === "sg-preview-ready") {
+        const s = state.current;
+        post({ type: "sg-preview-content", content: s.draft });
+        post({ type: "sg-preview-lang", lang: s.lang });
+        post({ type: "sg-edit-mode", edit: s.editMode });
+        post({ type: "sg-device", device: s.device });
+        post({ type: "sg-selected", path: s.selected });
+      }
+      if (m.type === "sg-select") onSelect({ path: m.path, kind: m.kind, label: m.label });
+      if (m.type === "sg-move") onMove(m);
+    };
+    window.addEventListener("message", onMsg);
+    return () => window.removeEventListener("message", onMsg);
+  }, [post, onSelect, onMove]);
+
+  useEffect(() => {
+    const t = setTimeout(() => post({ type: "sg-preview-content", content: draft }), 130);
+    return () => clearTimeout(t);
+  }, [draft, post]);
+
+  useEffect(() => post({ type: "sg-preview-lang", lang }), [lang, post]);
+  useEffect(() => post({ type: "sg-edit-mode", edit: editMode }), [editMode, post]);
+  useEffect(() => post({ type: "sg-device", device }), [device, post]);
+  useEffect(() => post({ type: "sg-selected", path: selected }), [selected, post]);
+  useEffect(() => {
+    if (scrollTo?.path) post({ type: "sg-scroll-to", path: scrollTo.path });
+  }, [scrollTo, post]);
 
   return (
     <div className="flex h-full w-full items-start justify-center overflow-hidden bg-[#08080a] p-4">
@@ -200,6 +204,10 @@ const Shell = ({ onLogout }) => {
   const [publishing, setPublishing] = useState(false);
   const [showPreview, setShowPreview] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [editMode, setEditMode] = useState(true);
+  const [sel, setSel] = useState(null);
+  const [snapshot, setSnapshot] = useState(null);
+  const [scrollTo, setScrollTo] = useState(null);
   const skipSave = useRef(true);
 
   const load = useCallback(async () => {
@@ -244,6 +252,48 @@ const Shell = ({ onLogout }) => {
     setDraft((d) => setIn(d, path, value));
   }, []);
 
+  const setStyle = useCallback((path, dev, key, value) => {
+    setDraft((d) => setIn(d, ["styles", path, dev, key], value));
+  }, []);
+
+  const resetStyle = useCallback((path) => {
+    setDraft((d) => {
+      const next = { ...(d.styles || {}) };
+      delete next[path];
+      return { ...d, styles: next };
+    });
+  }, []);
+
+  const copyDevice = useCallback((path) => {
+    setDraft((d) => setIn(d, ["styles", path, "m"], { ...((d.styles || {})[path]?.d || {}) }));
+    toast.success("Αντιγράφηκε στο κινητό");
+  }, []);
+
+  const onMove = useCallback(({ path, device: dev, x, y }) => {
+    setDraft((d) => setIn(setIn(d, ["styles", path, dev, "x"], x), ["styles", path, dev, "y"], y));
+  }, []);
+
+  const onSelect = useCallback((s) => {
+    setSel(s);
+    setScrollTo(null);
+  }, []);
+
+  const applyTemplate = useCallback(
+    (tpl) => {
+      setSnapshot(draft);
+      setDraft((d) => Object.entries(tpl.patch).reduce((acc, [k, v]) => setIn(acc, k, v), d));
+      toast.success(`Εφαρμόστηκε: ${tpl.name}`);
+    },
+    [draft]
+  );
+
+  const undoTemplate = useCallback(() => {
+    if (!snapshot) return;
+    setDraft(snapshot);
+    setSnapshot(null);
+    toast.success("Η εμφάνιση επανήλθε");
+  }, [snapshot]);
+
   const publish = async () => {
     setPublishing(true);
     try {
@@ -280,13 +330,14 @@ const Shell = ({ onLogout }) => {
     }
   };
 
-  // Cmd/Ctrl + S
+  // Cmd/Ctrl + S, Esc
   useEffect(() => {
     const onKey = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") {
         e.preventDefault();
         if (draft) api.saveDraft(draft).then(() => setSaving("saved")).catch(() => {});
       }
+      if (e.key === "Escape") setSel(null);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -318,6 +369,17 @@ const Shell = ({ onLogout }) => {
         return <FooterEditor {...p} />;
       case "layout":
         return <LayoutEditor {...p} />;
+      case "templates":
+        return (
+          <TemplatesEditor
+            d={draft}
+            onApply={applyTemplate}
+            onUndo={undoTemplate}
+            canUndo={!!snapshot}
+            onResetStyle={resetStyle}
+            onClearStyles={() => setDraft((x) => ({ ...x, styles: {} }))}
+          />
+        );
       case "theme":
         return <ThemeEditor {...p} />;
       case "design":
@@ -333,7 +395,7 @@ const Shell = ({ onLogout }) => {
       default:
         return null;
     }
-  }, [tab, draft, set, load, onLogout, resetAll]);
+  }, [tab, draft, set, load, onLogout, resetAll, applyTemplate, undoTemplate, snapshot, resetStyle]);
 
   if (!draft) {
     return (
@@ -370,6 +432,29 @@ const Shell = ({ onLogout }) => {
             </span>
 
             <div className="ml-auto flex items-center gap-2">
+              {/* click-to-edit mode */}
+              <div className="hidden items-center rounded-full border border-white/12 p-[3px] text-[10.5px] font-bold lg:flex">
+                {[
+                  { k: true, label: "Επιλογή", icon: "MousePointerClick", tip: "Πάτα στοιχεία στο preview για να τα αλλάξεις" },
+                  { k: false, label: "Περιήγηση", icon: "Hand", tip: "Κάνε κλικ κανονικά μέσα στο site" },
+                ].map((m) => {
+                  const I = Icons[m.icon];
+                  return (
+                    <button
+                      key={String(m.k)}
+                      type="button"
+                      title={m.tip}
+                      data-testid={`studio-mode-${m.k ? "edit" : "browse"}`}
+                      onClick={() => setEditMode(m.k)}
+                      className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 transition-colors ${editMode === m.k ? "bg-white text-black" : "text-white/50"}`}
+                    >
+                      <I className="h-3 w-3" />
+                      {m.label}
+                    </button>
+                  );
+                })}
+              </div>
+
               {/* editing language */}
               <div className="flex items-center rounded-full border border-white/12 p-[3px] text-[10.5px] font-bold">
                 {["el", "en", "both"].map((l) => (
@@ -396,6 +481,7 @@ const Shell = ({ onLogout }) => {
                       key={k}
                       type="button"
                       title={v.label}
+                      data-testid={`studio-device-${k}`}
                       onClick={() => setDevice(k)}
                       className={`rounded-full px-2.5 py-1.5 transition-colors ${device === k ? "bg-white text-black" : "text-white/45"}`}
                     >
@@ -464,7 +550,10 @@ const Shell = ({ onLogout }) => {
 
         <div className="flex">
           {/* sidebar */}
-          <aside className="hidden w-[228px] shrink-0 border-r border-white/[0.07] px-3 py-4 md:block" style={{ height: "calc(100vh - 56px)", overflowY: "auto", position: "sticky", top: 56 }}>
+          <aside
+            className="hidden w-[228px] shrink-0 border-r border-white/[0.07] px-3 py-4 md:block"
+            style={{ height: "calc(100vh - 56px)", overflowY: "auto", position: "sticky", top: 56 }}
+          >
             {GROUPS.map((g) => (
               <div key={g.id} className="mb-4">
                 {g.label && <p className="mb-1.5 px-3 text-[9.5px] font-extrabold uppercase tracking-[0.18em] text-white/25">{g.label}</p>}
@@ -490,7 +579,7 @@ const Shell = ({ onLogout }) => {
 
           {/* editor column */}
           <main className="min-w-0 flex-1 md:flex">
-            <div className="w-full shrink-0 px-4 py-5 md:max-w-[560px] md:px-5" style={{ minWidth: 0 }}>
+            <div className="w-full shrink-0 space-y-5 px-4 py-5 md:max-w-[560px] md:px-5" style={{ minWidth: 0 }}>
               {/* mobile tabs */}
               <div className="mb-4 flex gap-1.5 overflow-x-auto pb-1 md:hidden">
                 {NAV.map((n) => (
@@ -506,13 +595,44 @@ const Shell = ({ onLogout }) => {
                   </button>
                 ))}
               </div>
+
+              {sel ? (
+                <Inspector
+                  sel={sel}
+                  draft={draft}
+                  set={set}
+                  onSet={setStyle}
+                  onReset={resetStyle}
+                  onCopyDevice={copyDevice}
+                  onClose={() => setSel(null)}
+                  onGoTab={(t) => setTab(t)}
+                  onScrollTo={(path) => setScrollTo({ path, at: Date.now() })}
+                />
+              ) : (
+                editMode && (
+                  <div className="flex items-start gap-2.5 rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3 text-[12px] leading-relaxed text-white/45">
+                    <Icons.MousePointerClick className="mt-0.5 h-4 w-4 shrink-0 text-[#60d6ff]" />
+                    Πάτα οποιοδήποτε κείμενο, κουμπί, κάρτα ή εικόνα μέσα στο preview για να το αλλάξεις — ή σύρε το για να το μετακινήσεις.
+                  </div>
+                )
+              )}
+
               {body}
               <div className="h-16" />
             </div>
 
             {showPreview && (
               <div className="hidden flex-1 border-l border-white/[0.07] lg:block" style={{ height: "calc(100vh - 56px)", position: "sticky", top: 56 }}>
-                <Preview draft={draft} lang={editLang === "both" ? previewLang : editLang} device={device} />
+                <Preview
+                  draft={draft}
+                  lang={editLang === "both" ? previewLang : editLang}
+                  device={device}
+                  editMode={editMode}
+                  selected={sel?.path || null}
+                  onSelect={onSelect}
+                  onMove={onMove}
+                  scrollTo={scrollTo}
+                />
               </div>
             )}
           </main>

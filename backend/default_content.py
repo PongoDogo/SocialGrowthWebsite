@@ -35,6 +35,8 @@ DEFAULT_CONTENT = {
         "socials": {"ig": "", "tt": "", "fb": "", "yt": ""},
     },
     "theme": {
+        "mode": "dark",
+        "ink": "#12121a",
         "accent": "#60d6ff",
         "accentDeep": "#2563eb",
         "accentSoft": "#a8ecff",
@@ -206,6 +208,8 @@ DEFAULT_CONTENT = {
         ),
         "rows": 3,
         "speed": 54,
+        "gap": 20,
+        "fadeEdges": 7,
         "pauseOnHover": True,
         "showNames": True,
         "showSocials": True,
@@ -293,6 +297,8 @@ DEFAULT_CONTENT = {
         "order": ["hero", "clients", "stats", "services", "process", "contact"],
         "hidden": [],
     },
+    "blocks": [],
+    "styles": {},
 }
 
 
