@@ -229,16 +229,16 @@ async def public_content():
 async def admin_content(stage: str = "draft", _: str = Depends(require_admin)):
     if stage not in ("draft", "published"):
         raise HTTPException(status_code=400, detail="stage must be draft or published")
-    await get_stage("published")
-    await get_stage("draft")
-    data = await get_stage(stage)
+    published = await get_stage("published")
+    draft = await get_stage("draft")
+    data = draft if stage == "draft" else published
     doc = await db.site_content.find_one({"_id": stage})
     pub = await db.site_content.find_one({"_id": "published"})
     return {
         "data": data,
         "updated_at": (doc or {}).get("updated_at"),
         "published_at": (pub or {}).get("published_at"),
-        "dirty": (doc or {}).get("data") != (pub or {}).get("data"),
+        "dirty": draft != published,
     }
 
 
@@ -511,11 +511,11 @@ async def delete_contact(cid: str, _: str = Depends(require_admin)):
 
 @admin_router.get("/overview")
 async def overview(_: str = Depends(require_admin)):
-    await get_stage("published")
-    await get_stage("draft")
+    published = await get_stage("published")
+    draft_data = await get_stage("draft")
     pub = await db.site_content.find_one({"_id": "published"})
     draft = await db.site_content.find_one({"_id": "draft"})
-    data = (pub or {}).get("data") or {}
+    data = published
     audit = await db.studio_audit.find({}, {"_id": 0}).sort("at", -1).to_list(length=12)
     return {
         "contacts": await db.contacts.count_documents({}),
@@ -524,6 +524,6 @@ async def overview(_: str = Depends(require_admin)):
         "revisions": await db.site_revisions.count_documents({}),
         "published_at": (pub or {}).get("published_at"),
         "draft_updated_at": (draft or {}).get("updated_at"),
-        "dirty": (draft or {}).get("data") != (pub or {}).get("data"),
+        "dirty": draft_data != published,
         "audit": audit,
     }
