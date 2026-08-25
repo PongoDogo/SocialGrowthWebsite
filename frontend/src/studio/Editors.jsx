@@ -16,7 +16,7 @@ import {
   ImagePicker,
   ListEditor,
 } from "@/studio/fields";
-import { uid, slugify, move, getIn } from "@/studio/util";
+import { uid, slugify, move, getIn, countStyleEntry } from "@/studio/util";
 import { FONTS } from "@/content/style";
 import { BLOCK_TYPES } from "@/components/Blocks";
 import { newBlock, BlockFields } from "@/studio/blocks";
@@ -56,12 +56,16 @@ const PAD_OPTS = [
 ];
 
 const LayoutPanel = ({ d, set, base, hint, children }) => (
-  <Panel title="Διάταξη & αποστάσεις" hint={hint || "Πού κάθονται τα κείμενα και πόσο αέρα έχει η ενότητα."}>
+  <Panel
+    title="Διάταξη & αποστάσεις"
+    hint={hint || "Πού κάθονται τα κείμενα και πόσο αέρα έχει η ενότητα."}
+    tip="Αν μια ενότητα σου φαίνεται «στριμωγμένη» ή έχει άδειο χώρο, εδώ είναι που το φτιάχνεις."
+  >
     <Grid>
-      <Row label="Στοίχιση κειμένων">
+      <Row label="Στοίχιση κειμένων" tip="Αν οι τίτλοι και τα κείμενα της ενότητας ξεκινούν από αριστερά ή είναι κεντραρισμένα.">
         <Select value={getIn(d, `${base}.align`) || "left"} onChange={(v) => set(`${base}.align`, v)} options={ALIGN_OPTS} />
       </Row>
-      <Row label="Κάθετες αποστάσεις">
+      <Row label="Κάθετες αποστάσεις" tip="Πόσος αέρας υπάρχει πάνω και κάτω από την ενότητα. «Στενές» φέρνει τις ενότητες κοντά, «Πολύ άνετες» αφήνει πολύ κενό.">
         <Select value={getIn(d, `${base}.padding`) || "normal"} onChange={(v) => set(`${base}.padding`, v)} options={PAD_OPTS} />
       </Row>
     </Grid>
@@ -144,38 +148,42 @@ export const ThemeEditor = ({ d, set }) => (
         )}
       </Grid>
       <Grid>
-        <Row label="Accent (κύριο)">
+        <Row label="Accent (κύριο)" tip="Το κύριο χρώμα της μάρκας σου. Χρησιμοποιείται στους μικρούς τίτλους, στα links, στα τικ και στη χρωματιστή λέξη του τίτλου.">
           <ColorInput value={d.theme?.accent} onChange={(v) => set("theme.accent", v)} />
         </Row>
-        <Row label="Accent σκούρο (gradient)">
+        <Row label="Accent σκούρο (gradient)" tip="Η σκούρα άκρη των ντεγκραντέ. Βάλε μια πιο σκούρα εκδοχή του κύριου χρώματος.">
           <ColorInput value={d.theme?.accentDeep} onChange={(v) => set("theme.accentDeep", v)} />
         </Row>
-        <Row label="Accent απαλό (gradient)">
+        <Row label="Accent απαλό (gradient)" tip="Η φωτεινή άκρη των ντεγκραντέ και των λάμψεων στο background.">
           <ColorInput value={d.theme?.accentSoft} onChange={(v) => set("theme.accentSoft", v)} />
         </Row>
       </Grid>
     </Panel>
     <Panel title="Φόντο & καρτέλες" hint="Το γενικό φόντο της σελίδας και το χρώμα των καρτών.">
       <Grid>
-        <Row label="Φόντο σελίδας">
+        <Row label="Φόντο σελίδας" tip="Το χρώμα πίσω από όλα. Σε σκούρο θέμα κράτα το πολύ σκούρο για να ξεχωρίζουν οι κάρτες.">
           <ColorInput value={d.theme?.bg} onChange={(v) => set("theme.bg", v)} />
         </Row>
-        <Row label="Χρώμα καρτών">
+        <Row label="Χρώμα καρτών" tip="Το φόντο των καρτών (υπηρεσίες, νούμερα, μαγαζιά). Λίγο πιο φωτεινό από το φόντο σελίδας δίνει το καλύτερο αποτέλεσμα.">
           <ColorInput value={d.theme?.surface} onChange={(v) => set("theme.surface", v)} />
         </Row>
       </Grid>
       <Grid>
-        <Row label="Χρώμα περιγράμματος">
+        <Row label="Χρώμα περιγράμματος" tip="Το χρώμα των λεπτών γραμμών γύρω από κάρτες και πεδία.">
           <ColorInput value={d.theme?.borderColor} onChange={(v) => set("theme.borderColor", v)} />
         </Row>
-        <Row label="Έντασή περιγράμματος">
+        <Row label="Έντασή περιγράμματος" tip="Πόσο έντονα φαίνονται τα περιγράμματα. 0% τα εξαφανίζει τελείως για πιο καθαρό look.">
           <Slider value={d.theme?.borderOpacity ?? 8} onChange={(v) => set("theme.borderOpacity", v)} min={0} max={40} suffix="%" />
         </Row>
       </Grid>
-      <Row label="Στρογγύλεμα καρτών">
+      <Row label="Στρογγύλεμα καρτών" tip="Ισχύει για όλες τις κάρτες του site. Μικρές τιμές = αυστηρό look, μεγάλες = φιλικό.">
         <Slider value={d.theme?.cardRadius ?? 24} onChange={(v) => set("theme.cardRadius", v)} min={0} max={40} suffix="px" />
       </Row>
-      <Row label="Πλάτος περιεχομένου" hint="Πόσο φαρδύ είναι το site στο κέντρο της οθόνης.">
+      <Row
+        label="Πλάτος περιεχομένου"
+        hint="Πόσο φαρδύ είναι το site στο κέντρο της οθόνης."
+        tip="Το μέγιστο πλάτος του περιεχομένου σε μεγάλες οθόνες. Μικρότερη τιμή = πιο μαζεμένο και ευανάγνωστο, μεγαλύτερη = γεμίζει την οθόνη."
+      >
         <Slider value={d.theme?.containerWidth ?? 1240} onChange={(v) => set("theme.containerWidth", v)} min={1000} max={1600} step={20} suffix="px" />
       </Row>
     </Panel>
@@ -199,9 +207,9 @@ export const NavEditor = ({ d, set }) => (
         label="Εμφάνιση διακόπτη EL / EN"
         hint="Κρύψε τον αν θέλεις μόνο ελληνικά"
       />
-      <Toggle value={d.nav?.showCta !== false} onChange={(v) => set("nav.showCta", v)} label="Εμφάνιση κουμπιού CTA" />
+      <Toggle value={d.nav?.showCta !== false} onChange={(v) => set("nav.showCta", v)} label="Εμφάνιση κουμπιού CTA" tip="Το έντονο κουμπί πάνω δεξιά στη μπάρα. Κρύψε το αν θέλεις πιο λιτή μπάρα." />
       <Grid>
-        <Row label="Θέση λογοτύπου">
+        <Row label="Θέση λογοτύπου" tip="Αριστερά είναι το κλασικό. Στο κέντρο δίνει πιο «boutique» αίσθηση, με τα links να μοιράζονται δεξιά κι αριστερά.">
           <Select
             value={d.nav?.logoPosition || "left"}
             onChange={(v) => set("nav.logoPosition", v)}
@@ -211,7 +219,7 @@ export const NavEditor = ({ d, set }) => (
             ]}
           />
         </Row>
-        <Row label="Θέση links">
+        <Row label="Θέση links" tip="Πού κάθονται τα links μέσα στη μπάρα. Δουλεύει μαζί με τη θέση του λογοτύπου.">
           <Select
             value={d.nav?.linksAlign || "center"}
             onChange={(v) => set("nav.linksAlign", v)}
@@ -223,8 +231,18 @@ export const NavEditor = ({ d, set }) => (
           />
         </Row>
       </Grid>
-      <Toggle value={d.nav?.sticky !== false} onChange={(v) => set("nav.sticky", v)} label="Να μένει κολλημένη στο πάνω μέρος" />
-      <Toggle value={d.nav?.blur !== false} onChange={(v) => set("nav.blur", v)} label="Θαμπό γυάλινο φόντο στο scroll" />
+      <Toggle
+        value={d.nav?.sticky !== false}
+        onChange={(v) => set("nav.sticky", v)}
+        label="Να μένει κολλημένη στο πάνω μέρος"
+        tip="Η μπάρα ακολουθεί τον επισκέπτη καθώς κατεβαίνει, ώστε το κουμπί επικοινωνίας να είναι πάντα διαθέσιμο."
+      />
+      <Toggle
+        value={d.nav?.blur !== false}
+        onChange={(v) => set("nav.blur", v)}
+        label="Θαμπό γυάλινο φόντο στο scroll"
+        tip="Καθώς κατεβαίνεις, η μπάρα αποκτά θολό ημιδιάφανο φόντο ώστε να διαβάζονται τα links πάνω από το περιεχόμενο."
+      />
     </Panel>
     <Panel title="Links" hint="Σύρε για αλλαγή σειράς. Ο «Στόχος» είναι η ενότητα όπου σκρολάρει.">
       <ListEditor
@@ -319,9 +337,9 @@ export const HeroEditor = ({ d, set }) => (
     </Panel>
 
     <Panel title="Εικόνα" hint="Εμφανίζεται δίπλα στα κείμενα σε desktop.">
-      <Toggle value={d.hero?.showImage !== false} onChange={(v) => set("hero.showImage", v)} label="Εμφάνιση εικόνας" />
-      <Toggle value={d.hero?.floatImage !== false} onChange={(v) => set("hero.floatImage", v)} label="Να αιωρείται απαλά" />
-      <Row label="Πλευρά εικόνας">
+      <Toggle value={d.hero?.showImage !== false} onChange={(v) => set("hero.showImage", v)} label="Εμφάνιση εικόνας" tip="Αν την κλείσεις, τα κείμενα της αρχής πιάνουν όλο το πλάτος." />
+      <Toggle value={d.hero?.floatImage !== false} onChange={(v) => set("hero.floatImage", v)} label="Να αιωρείται απαλά" tip="Δίνει στην εικόνα μια αργή κίνηση πάνω-κάτω, σαν να επιπλέει." />
+      <Row label="Πλευρά εικόνας" tip="Σε ποια πλευρά κάθεται η εικόνα σε desktop. Στο κινητό μπαίνει πάντα κάτω από τα κείμενα.">
         <Select
           value={d.hero?.imageSide || "right"}
           onChange={(v) => set("hero.imageSide", v)}
@@ -335,7 +353,7 @@ export const HeroEditor = ({ d, set }) => (
     </Panel>
 
     <LayoutPanel d={d} set={set} base="hero" hint="Στοίχιση, αποστάσεις και θέση κουμπιών στην πρώτη οθόνη.">
-      <Row label="Θέση κουμπιών">
+      <Row label="Θέση κουμπιών" tip="Πού κάθονται τα δύο κουμπιά. Αν έχεις κεντράρει τα κείμενα, κέντραρε και τα κουμπιά για συμμετρία.">
         <Select
           value={d.hero?.buttonsAlign || "left"}
           onChange={(v) => set("hero.buttonsAlign", v)}
@@ -401,7 +419,7 @@ export const StatsEditor = ({ d, set }) => (
     </Panel>
 
     <LayoutPanel d={d} set={set} base="stats">
-      <Row label="Στήλες σε desktop">
+      <Row label="Στήλες σε desktop" tip="Σε πόσες στήλες μπαίνουν τα νούμερα σε μεγάλη οθόνη. Διάλεξε αριθμό που να διαιρεί τα νούμερά σου, αλλιώς η τελευταία σειρά μένει μισοάδεια.">
         <Select
           value={String(d.stats?.columns || 4)}
           onChange={(v) => set("stats.columns", Number(v))}
@@ -423,7 +441,7 @@ export const ServicesEditor = ({ d, set }) => (
       <Bi label="Μικρός τίτλος" value={d.services?.overline} onChange={(v) => set("services.overline", v)} />
       <Bi label="Τίτλος" value={d.services?.title} onChange={(v) => set("services.title", v)} />
       <Bi label="Υπότιτλος" rows={2} value={d.services?.sub} onChange={(v) => set("services.sub", v)} />
-      <Row label="Στήλες σε desktop">
+      <Row label="Στήλες σε desktop" tip="Σε πόσες στήλες μπαίνουν οι κάρτες υπηρεσιών. Με 6 υπηρεσίες, οι 3 στήλες δίνουν δύο γεμάτες σειρές — καμία μισοάδεια γραμμή.">
         <Select
           value={String(d.services?.columns || 3)}
           onChange={(v) => set("services.columns", Number(v))}
@@ -472,8 +490,8 @@ export const ClientsEditor = ({ d, set }) => (
       <Bi label="Υπότιτλος" rows={2} value={d.clients?.sub} onChange={(v) => set("clients.sub", v)} />
     </Panel>
 
-    <Panel title="Ρυθμίσεις carousel">
-      <Row label="Σειρές" hint="Τα μαγαζιά μοιράζονται αυτόματα στις σειρές.">
+    <Panel title="Ρυθμίσεις carousel" tip="Το carousel κινείται συνεχώς και σταματάει απαλά όταν περνάς το ποντίκι πάνω του.">
+      <Row label="Σειρές" hint="Τα μαγαζιά μοιράζονται αυτόματα στις σειρές." tip="Κάθε σειρά κινείται προς αντίθετη κατεύθυνση. Με πολλά μαγαζιά, 3 σειρές δείχνουν καλύτερα.">
         <Select
           value={String(d.clients?.rows || 3)}
           onChange={(v) => set("clients.rows", Number(v))}
@@ -485,14 +503,22 @@ export const ClientsEditor = ({ d, set }) => (
           ]}
         />
       </Row>
-      <Row label="Ταχύτητα" hint="Μικρότερος αριθμός = πιο γρήγορη κίνηση (δευτερόλεπτα ανά γύρο).">
+      <Row
+        label="Ταχύτητα"
+        hint="Μικρότερος αριθμός = πιο γρήγορη κίνηση (δευτερόλεπτα ανά γύρο)."
+        tip="Πόσα δευτερόλεπτα κάνει μια κάρτα για να διασχίσει την οθόνη. Γύρω στα 50s είναι ήρεμο και διαβάζονται τα λογότυπα."
+      >
         <Slider value={d.clients?.speed || 54} onChange={(v) => set("clients.speed", v)} min={15} max={140} suffix="s" />
       </Row>
       <Grid>
-        <Row label="Κενό ανάμεσα στις κάρτες">
+        <Row label="Κενό ανάμεσα στις κάρτες" tip="Η απόσταση ανάμεσα στα λογότυπα. Λίγο περισσότερο κενό κάνει το carousel να «ανασαίνει».">
           <Slider value={d.clients?.gap ?? 20} onChange={(v) => set("clients.gap", v)} min={0} max={60} suffix="px" />
         </Row>
-        <Row label="Σβήσιμο στις άκρες" hint="0 = οι κάρτες φτάνουν κολλητά στην άκρη χωρίς fade.">
+        <Row
+          label="Σβήσιμο στις άκρες"
+          hint="0 = οι κάρτες φτάνουν κολλητά στην άκρη χωρίς fade."
+          tip="Σβήνει απαλά τις κάρτες στις δύο άκρες, ώστε να μη «κόβονται» απότομα. Βάλε 0 για σκληρή άκρη."
+        >
           <Slider value={d.clients?.fadeEdges ?? 7} onChange={(v) => set("clients.fadeEdges", v)} min={0} max={22} suffix="%" />
         </Row>
       </Grid>
@@ -507,10 +533,10 @@ export const ClientsEditor = ({ d, set }) => (
           ]}
         />
       </Row>
-      <Toggle value={d.clients?.pauseOnHover !== false} onChange={(v) => set("clients.pauseOnHover", v)} label="Πάγωμα στο hover" />
-      <Toggle value={d.clients?.showNames !== false} onChange={(v) => set("clients.showNames", v)} label="Εμφάνιση ονομάτων" />
-      <Toggle value={d.clients?.showSocials !== false} onChange={(v) => set("clients.showSocials", v)} label="Εμφάνιση social εικονιδίων" />
-      <Row label="Θέση social εικονιδίων">
+      <Toggle value={d.clients?.pauseOnHover !== false} onChange={(v) => set("clients.pauseOnHover", v)} label="Πάγωμα στο hover" tip="Η σειρά σταματάει απαλά όταν ο επισκέπτης βάλει το ποντίκι πάνω, για να δει το λογότυπο." />
+      <Toggle value={d.clients?.showNames !== false} onChange={(v) => set("clients.showNames", v)} label="Εμφάνιση ονομάτων" tip="Το όνομα του μαγαζιού κάτω από το λογότυπο. Κλείσ' το για πιο καθαρό, μόνο-λογότυπα look." />
+      <Toggle value={d.clients?.showSocials !== false} onChange={(v) => set("clients.showSocials", v)} label="Εμφάνιση social εικονιδίων" tip="Τα μικρά εικονίδια Instagram / TikTok σε κάθε κάρτα. Εμφανίζονται μόνο για τα μαγαζιά που έχεις συμπληρώσει username." />
+      <Row label="Θέση social εικονιδίων" tip="Πού μπαίνουν τα εικονίδια μέσα στην κάρτα σε σχέση με το λογότυπο και το όνομα.">
         <Select
           value={d.clients?.socialsPosition || "below"}
           onChange={(v) => set("clients.socialsPosition", v)}
@@ -521,7 +547,7 @@ export const ClientsEditor = ({ d, set }) => (
         />
       </Row>
       <Grid>
-        <Row label="Μέγεθος καρτών">
+        <Row label="Μέγεθος καρτών" tip="Πόσο μεγάλες είναι οι κάρτες του carousel. Μεγάλες κάρτες = λιγότερες ορατές ταυτόχρονα.">
           <Select
             value={d.clients?.cardSize || "md"}
             onChange={(v) => set("clients.cardSize", v)}
@@ -532,11 +558,11 @@ export const ClientsEditor = ({ d, set }) => (
             ]}
           />
         </Row>
-        <Row label="Στρογγύλεμα καρτών">
+        <Row label="Στρογγύλεμα καρτών" tip="Οι γωνίες των καρτών του carousel, ανεξάρτητα από το γενικό στρογγύλεμα του site.">
           <Slider value={d.clients?.cardRadius ?? 22} onChange={(v) => set("clients.cardRadius", v)} min={0} max={40} suffix="px" />
         </Row>
       </Grid>
-      <Row label="Μέγεθος λογοτύπων">
+      <Row label="Μέγεθος λογοτύπων" tip="Πόσο χώρο πιάνει το λογότυπο μέσα στην κάρτα. Χαμήλωσέ το αν κάποια λογότυπα φαίνονται να «πνίγονται» στην κάρτα.">
         <Slider value={d.clients?.logoMax ?? 100} onChange={(v) => set("clients.logoMax", v)} min={60} max={150} suffix="%" />
       </Row>
     </Panel>
@@ -698,7 +724,7 @@ export const ContactEditor = ({ d, set }) => (
     </Panel>
 
     <LayoutPanel d={d} set={set} base="contact">
-      <Row label="Πλευρά φόρμας">
+      <Row label="Πλευρά φόρμας" tip="Σε ποια πλευρά μπαίνει η φόρμα σε desktop. Στο κινητό μπαίνει πάντα κάτω από τα κείμενα.">
         <Select
           value={d.contact?.formSide || "right"}
           onChange={(v) => set("contact.formSide", v)}
@@ -717,8 +743,8 @@ export const FooterEditor = ({ d, set }) => (
   <Panel title="Footer" hint="Η τελευταία γραμμή του site.">
     <Bi label="Tagline κάτω από το λογότυπο" value={d.footer?.tagline} onChange={(v) => set("footer.tagline", v)} />
     <Bi label="Κείμενο δικαιωμάτων" value={d.footer?.rights} onChange={(v) => set("footer.rights", v)} />
-    <Toggle value={d.footer?.showSocials !== false} onChange={(v) => set("footer.showSocials", v)} label="Εμφάνιση social εικονιδίων" />
-    <Row label="Διάταξη">
+    <Toggle value={d.footer?.showSocials !== false} onChange={(v) => set("footer.showSocials", v)} label="Εμφάνιση social εικονιδίων" tip="Τα social της εταιρίας στο footer. Συμπληρώνονται από «Ταυτότητα & SEO»." />
+    <Row label="Διάταξη" tip="«Απλωμένο» βάζει το λογότυπο αριστερά και τα links δεξιά. «Όλα στο κέντρο» τα στοιβάζει κεντραρισμένα — ταιριάζει σε λιτά sites.">
       <Select
         value={d.footer?.layout || "spread"}
         onChange={(v) => set("footer.layout", v)}
@@ -940,10 +966,7 @@ export const LayoutEditor = ({ d, set }) => {
 
 /* ================================================================= Templates */
 export const TemplatesEditor = ({ d, onApply, onUndo, canUndo, onResetStyle, onClearStyles }) => {
-  const styleKeys = Object.keys(d.styles || {}).filter((k) => {
-    const s = d.styles[k] || {};
-    return Object.keys(s.d || {}).length || Object.keys(s.m || {}).length;
-  });
+  const styleKeys = Object.keys(d.styles || {}).filter((k) => countStyleEntry(d.styles[k]) > 0);
   return (
     <div className="space-y-5">
     <Panel
@@ -1030,17 +1053,21 @@ export const DesignEditor = ({ d, set }) => {
     <div className="space-y-5">
       <Panel title="Γραμματοσειρές" hint="Η πρώτη είναι για τους τίτλους, η δεύτερη για τα κείμενα.">
         <Grid>
-          <Row label="Γραμματοσειρά τίτλων">
+          <Row label="Γραμματοσειρά τίτλων" tip="Χρησιμοποιείται στους μεγάλους τίτλους. Εδώ επιτρέπεται κάτι με χαρακτήρα, αφού τα γράμματα είναι λίγα και μεγάλα.">
             <Select value={d.theme?.fonts?.display || "Bricolage Grotesque"} onChange={(v) => set("theme.fonts.display", v)} options={fontOptions} />
           </Row>
-          <Row label="Γραμματοσειρά κειμένων">
+          <Row label="Γραμματοσειρά κειμένων" tip="Για όλα τα τρεχούμενα κείμενα και τα κουμπιά. Διάλεξε κάτι ήρεμο και ευανάγνωστο.">
             <Select value={d.theme?.fonts?.body || "Manrope"} onChange={(v) => set("theme.fonts.body", v)} options={fontOptions} />
           </Row>
         </Grid>
-        <Row label="Γενικό μέγεθος γραμμάτων" hint="Μεγαλώνει ή μικραίνει αναλογικά όλο το site.">
+        <Row
+          label="Γενικό μέγεθος γραμμάτων"
+          hint="Μεγαλώνει ή μικραίνει αναλογικά όλο το site."
+          tip="Κλιμακώνει ΟΛΑ τα γράμματα του site μαζί, κρατώντας τις αναλογίες. Ο γρήγορος τρόπος να κάνεις το site πιο άνετο στο διάβασμα."
+        >
           <Slider value={d.theme?.fonts?.scale ?? 100} onChange={(v) => set("theme.fonts.scale", v)} min={85} max={120} suffix="%" />
         </Row>
-        <Row label="Βάρος τίτλων">
+        <Row label="Βάρος τίτλων" tip="Πόσο έντονοι είναι οι τίτλοι. Το «Πολύ έντονο» δίνει δυναμικό, διαφημιστικό τόνο· το «Ημι-έντονο» πιο κομψό.">
           <Select
             value={String(d.theme?.fonts?.headingWeight || 800)}
             onChange={(v) => set("theme.fonts.headingWeight", Number(v))}
@@ -1055,7 +1082,7 @@ export const DesignEditor = ({ d, set }) => {
 
       <Panel title="Κουμπιά" hint="Ισχύει για όλα τα κουμπιά του site.">
         <Grid>
-          <Row label="Σχήμα">
+          <Row label="Σχήμα" tip="Το στρογγύλεμα των γωνιών σε όλα τα κουμπιά. Τα «χάπια» δείχνουν φιλικά, τα τετράγωνα πιο αυστηρά και τεχνολογικά.">
             <Select
               value={d.theme?.buttons?.shape || "pill"}
               onChange={(v) => set("theme.buttons.shape", v)}
@@ -1066,7 +1093,7 @@ export const DesignEditor = ({ d, set }) => {
               ]}
             />
           </Row>
-          <Row label="Μέγεθος">
+          <Row label="Μέγεθος" tip="Πόσο μεγάλα και «παχιά» είναι τα κουμπιά. Τα μεγάλα κουμπιά πατιούνται πιο εύκολα στο κινητό.">
             <Select
               value={d.theme?.buttons?.size || "md"}
               onChange={(v) => set("theme.buttons.size", v)}
@@ -1079,14 +1106,14 @@ export const DesignEditor = ({ d, set }) => {
           </Row>
         </Grid>
         <Grid>
-          <Row label="Χρώμα κύριου κουμπιού">
+          <Row label="Χρώμα κύριου κουμπιού" tip="Το φόντο του βασικού κουμπιού δράσης (π.χ. «Ζήτα προσφορά»).">
             <ColorInput value={d.theme?.buttons?.primaryBg} onChange={(v) => set("theme.buttons.primaryBg", v)} />
           </Row>
-          <Row label="Χρώμα κειμένου κουμπιού">
+          <Row label="Χρώμα κειμένου κουμπιού" tip="Τα γράμματα μέσα στο κύριο κουμπί. Κράτα δυνατή αντίθεση με το φόντο του, ώστε να διαβάζεται.">
             <ColorInput value={d.theme?.buttons?.primaryText} onChange={(v) => set("theme.buttons.primaryText", v)} />
           </Row>
         </Grid>
-        <Row label="Στυλ δεύτερου κουμπιού">
+        <Row label="Στυλ δεύτερου κουμπιού" tip="Το δεύτερο κουμπί πρέπει να τραβάει λιγότερο το βλέμμα από το κύριο. «Μόνο κείμενο» είναι το πιο διακριτικό.">
           <Select
             value={d.theme?.buttons?.secondaryStyle || "outline"}
             onChange={(v) => set("theme.buttons.secondaryStyle", v)}
@@ -1102,11 +1129,12 @@ export const DesignEditor = ({ d, set }) => {
           onChange={(v) => set("theme.buttons.showIcons", v)}
           label="Εικονίδια μέσα στα κουμπιά"
           hint="Τα βελάκια και τα μικρά σύμβολα δίπλα στο κείμενο"
+          tip="Τα μικρά βελάκια δίνουν την αίσθηση κίνησης προς τα εμπρός. Κλείσ' τα για πιο λιτά, καθαρά κουμπιά."
         />
       </Panel>
 
       <Panel title="Εικονίδια" hint="Πώς δείχνουν τα τετράγωνα εικονίδια στις υπηρεσίες και στις κάρτες.">
-        <Row label="Στυλ">
+        <Row label="Στυλ" tip="Το πλαίσιο γύρω από κάθε εικονίδιο. Το «Απαλό χρωματιστό» χρησιμοποιεί το χρώμα κάθε υπηρεσίας σε χαμηλή έντασή.">
           <Select
             value={d.theme?.icons?.style || "soft"}
             onChange={(v) => set("theme.icons.style", v)}
@@ -1117,7 +1145,7 @@ export const DesignEditor = ({ d, set }) => {
             ]}
           />
         </Row>
-        <Row label="Μέγεθος πλαισίου">
+        <Row label="Μέγεθος πλαισίου" tip="Πόσο μεγάλο είναι το τετράγωνο του εικονιδίου μέσα στην κάρτα.">
           <Slider value={d.theme?.icons?.size ?? 100} onChange={(v) => set("theme.icons.size", v)} min={70} max={140} suffix="%" />
         </Row>
       </Panel>

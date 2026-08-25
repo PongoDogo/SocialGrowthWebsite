@@ -56,6 +56,10 @@ const DEVICES = {
   mobile: { w: "390px", label: "Κινητό", icon: "Smartphone" },
 };
 
+/* preview device  <->  the key styles are stored under (d / t / m) */
+const DEV_KEY = { desktop: "d", tablet: "t", mobile: "m" };
+const DEV_OF = { d: "desktop", t: "tablet", m: "mobile" };
+
 /* ================================================================= Login */
 const Login = ({ onDone }) => {
   const [pw, setPw] = useState("");
@@ -253,7 +257,8 @@ const Shell = ({ onLogout }) => {
   }, []);
 
   const setStyle = useCallback((path, dev, key, value) => {
-    setDraft((d) => setIn(d, ["styles", path, dev, key], value));
+    const keys = Array.isArray(key) ? key : [key];
+    setDraft((d) => setIn(d, ["styles", path, dev, ...keys], value));
   }, []);
 
   const resetStyle = useCallback((path) => {
@@ -264,9 +269,12 @@ const Shell = ({ onLogout }) => {
     });
   }, []);
 
-  const copyDevice = useCallback((path) => {
-    setDraft((d) => setIn(d, ["styles", path, "m"], { ...((d.styles || {})[path]?.d || {}) }));
-    toast.success("Αντιγράφηκε στο κινητό");
+  const copyDevice = useCallback((path, from = "d", to = "m") => {
+    setDraft((d) => {
+      const src = (d.styles || {})[path]?.[from] || {};
+      return setIn(d, ["styles", path, to], JSON.parse(JSON.stringify(src)));
+    });
+    toast.success(`Αντιγράφηκε στο ${DEVICES[DEV_OF[to]]?.label || to}`);
   }, []);
 
   const onMove = useCallback(({ path, device: dev, x, y }) => {
@@ -604,6 +612,7 @@ const Shell = ({ onLogout }) => {
                   onSet={setStyle}
                   onReset={resetStyle}
                   onCopyDevice={copyDevice}
+                  deviceKey={DEV_KEY[device] || "d"}
                   onClose={() => setSel(null)}
                   onGoTab={(t) => setTab(t)}
                   onScrollTo={(path) => setScrollTo({ path, at: Date.now() })}

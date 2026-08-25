@@ -40,13 +40,22 @@ export const PreviewBridge = () => {
     selL.tag.style.background = "#60d6ff";
     hoverL.tag.style.background = "rgba(96,214,255,.85)";
 
-    const place = (layer, el, label) => {
+    /* geometry signatures, so we only touch the DOM when something really moved */
+    const lastGeom = { sel: "", hov: "" };
+
+    const place = (layer, el, label, key = "sel") => {
       if (!el || !el.isConnected) {
-        layer.box.style.opacity = "0";
-        layer.tag.style.opacity = "0";
+        if (lastGeom[key] !== "off") {
+          layer.box.style.opacity = "0";
+          layer.tag.style.opacity = "0";
+          lastGeom[key] = "off";
+        }
         return;
       }
       const r = el.getBoundingClientRect();
+      const sig = `${Math.round(r.left)}|${Math.round(r.top)}|${Math.round(r.width)}|${Math.round(r.height)}|${label || ""}`;
+      if (sig === lastGeom[key]) return;
+      lastGeom[key] = sig;
       layer.box.style.left = `${r.left - 3}px`;
       layer.box.style.top = `${r.top - 3}px`;
       layer.box.style.width = `${r.width + 6}px`;
@@ -65,20 +74,28 @@ export const PreviewBridge = () => {
       label: el.getAttribute("data-sg-label") || el.getAttribute("data-sg"),
     });
 
+    /* cached element lookups — querySelector on every animation frame was the jank */
+    const slots = { sel: { path: null, el: null }, hov: { path: null, el: null } };
+    const resolve = (slot, path) => {
+      if (!path) {
+        slot.path = null;
+        slot.el = null;
+        return null;
+      }
+      if (slot.path === path && slot.el && slot.el.isConnected) return slot.el;
+      slot.path = path;
+      slot.el = document.querySelector(`[data-sg="${path}"]`);
+      return slot.el;
+    };
+
     const refresh = () => {
       const s = state.current;
-      if (s.selected) {
-        const el = document.querySelector(`[data-sg="${s.selected}"]`);
-        place(selL, el, el ? el.getAttribute("data-sg-label") : "");
-      } else {
-        place(selL, null);
-      }
-      if (s.hover && s.hover !== s.selected) {
-        const el = document.querySelector(`[data-sg="${s.hover}"]`);
-        place(hoverL, el, el ? el.getAttribute("data-sg-label") : "");
-      } else {
-        place(hoverL, null);
-      }
+      const selEl = resolve(slots.sel, s.selected);
+      place(selL, selEl, selEl ? selEl.getAttribute("data-sg-label") : "", "sel");
+
+      const hovPath = s.hover && s.hover !== s.selected ? s.hover : null;
+      const hovEl = resolve(slots.hov, hovPath);
+      place(hoverL, hovEl, hovEl ? hovEl.getAttribute("data-sg-label") : "", "hov");
     };
 
     const onMove = (e) => {
@@ -118,7 +135,7 @@ export const PreviewBridge = () => {
       if (!el) return;
       const path = el.getAttribute("data-sg");
       if (el.getAttribute("data-sg-kind") === "section") return;
-      const device = state.current.device === "mobile" ? "m" : "d";
+      const device = state.current.device === "mobile" ? "m" : state.current.device === "tablet" ? "t" : "d";
       const base = getIn(contentRef.current, ["styles", path, device]) || {};
       state.current.drag = {
         el,

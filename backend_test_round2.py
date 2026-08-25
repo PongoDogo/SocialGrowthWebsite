@@ -11,7 +11,7 @@ import time
 from pathlib import Path
 
 # Backend URL from frontend/.env
-BACKEND_URL = "https://stable-deploy-18.preview.emergentagent.com"
+BACKEND_URL = "https://cautious-update.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 ADMIN_BASE = f"{API_BASE}/admin"
 

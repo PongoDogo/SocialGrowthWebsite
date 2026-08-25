@@ -37,7 +37,7 @@ const KIND_LABEL = {
 
 const isItemPath = (p) => /\.items\.\d+$/.test(String(p || ""));
 
-export const Inspector = ({ sel, draft, set, onSet, onReset, onCopyDevice, onClose, onGoTab, onScrollTo }) => {
+export const Inspector = ({ sel, draft, set, onSet, onReset, onCopyDevice, onClose, onGoTab, onScrollTo, deviceKey = "d" }) => {
   if (!sel?.path) return null;
   const { path, kind, label } = sel;
   const styles = draft.styles || {};
@@ -141,7 +141,7 @@ export const Inspector = ({ sel, draft, set, onSet, onReset, onCopyDevice, onClo
           Όλες οι ρυθμίσεις αυτής της ενότητας
         </button>
 
-        <StyleEditor path={path} styles={styles} kind={kind} onSet={onSet} onReset={onReset} onCopyDevice={onCopyDevice} />
+        <StyleEditor path={path} styles={styles} kind={kind} onSet={onSet} onReset={onReset} onCopyDevice={onCopyDevice} deviceKey={deviceKey} />
       </div>
     </section>
   );
