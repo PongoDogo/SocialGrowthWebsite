@@ -1,10 +1,17 @@
 // craco.config.js
 const path = require("path");
+const webpack = require("webpack");
 require("dotenv").config();
 
 // Check if we're in development/preview mode (not production build)
 // Craco sets NODE_ENV=development for start, NODE_ENV=production for build
 const isDevServer = process.env.NODE_ENV !== "production";
+const isAdminOnly = process.env.REACT_APP_ADMIN_ONLY === "true";
+const publicSiteUrl = (process.env.REACT_APP_PUBLIC_SITE_URL || "").replace(/\/$/, "");
+
+if (isAdminOnly && !publicSiteUrl) {
+  throw new Error("REACT_APP_PUBLIC_SITE_URL is required for the admin-only build.");
+}
 
 // Environment variable overrides
 const config = {
@@ -102,6 +109,17 @@ let webpackConfig = {
       if (config.enableHealthCheck && healthPluginInstance) {
         webpackConfig.plugins.push(healthPluginInstance);
       }
+
+      // Admin build only: keep the existing Studio preview code unchanged,
+      // but make window.location.origin resolve to the official site origin.
+      if (isAdminOnly) {
+        webpackConfig.plugins.push(
+          new webpack.DefinePlugin({
+            "window.location.origin": JSON.stringify(publicSiteUrl),
+          })
+        );
+      }
+
       return webpackConfig;
     },
   },
