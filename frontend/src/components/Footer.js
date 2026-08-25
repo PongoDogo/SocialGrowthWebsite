@@ -17,21 +17,27 @@ export const Footer = () => {
   const links = visibleItems(f.links);
 
   return (
-    <footer data-testid="footer" className="border-t border-white/[0.07] py-12 sm:py-14">
+    <footer
+      data-testid="footer"
+      data-sg="section:footer"
+      data-sg-kind="section"
+      data-sg-label="Ενότητα: Footer"
+      className="border-t border-white/[0.07] py-12 sm:py-14"
+    >
       <div
         className={`mx-auto flex flex-col items-center gap-8 px-6 text-center sm:px-8 ${
           stacked ? "" : "md:flex-row md:items-center md:justify-between md:text-left"
         }`}
         style={container(theme)}
       >
-        <div className="flex items-center gap-3">
+        <div data-sg="footer.brand" data-sg-kind="box" data-sg-label="Λογότυπο footer" className="flex items-center gap-3">
           {brand.logo && <img src={mediaUrl(brand.logo)} alt="" className="h-9 w-9 object-contain" />}
           <div>
             <p className="font-display text-base font-extrabold leading-none tracking-tight">
               {brand.name}
               <span style={{ color: accent }}>{brand.nameAccent}</span>
             </p>
-            <p className="mt-1.5 text-[11px] text-white/35 sm:text-xs">{L(f.tagline)}</p>
+            <p data-sg="footer.tagline" data-sg-kind="text" data-sg-label="Tagline" className="mt-1.5 text-[11px] text-white/35 sm:text-xs">{L(f.tagline)}</p>
           </div>
         </div>
 
@@ -69,7 +75,7 @@ export const Footer = () => {
           </div>
         )}
 
-        <p className="text-[11px] text-white/30 sm:text-xs">
+        <p data-sg="footer.rights" data-sg-kind="text" data-sg-label="Κείμενο δικαιωμάτων" className="text-[11px] text-white/30 sm:text-xs">
           © {new Date().getFullYear()} {brand.name}
           {brand.nameAccent}. {L(f.rights)}
         </p>

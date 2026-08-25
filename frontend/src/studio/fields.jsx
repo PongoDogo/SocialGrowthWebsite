@@ -8,12 +8,39 @@ import { move } from "@/studio/util";
 export const EditLangContext = createContext({ editLang: "el", setEditLang: () => {} });
 export const useEditLang = () => useContext(EditLangContext);
 
+/* ------------------------------------------------------------------ tooltip */
+/**
+ * Small, quiet "?" that explains a setting. Pure CSS hover (no state, no
+ * layout shift) so it never gets in the way while editing.
+ */
+export const Tip = ({ text, align = "left" }) => {
+  if (!text) return null;
+  return (
+    <span className="group relative ml-1.5 inline-flex shrink-0 align-middle">
+      <span className="inline-flex h-[15px] w-[15px] cursor-help items-center justify-center rounded-full border border-white/15 text-white/35 transition-colors group-hover:border-[#60d6ff]/70 group-hover:text-[#60d6ff]">
+        <Icons.Info className="h-[9px] w-[9px]" />
+      </span>
+      <span
+        role="tooltip"
+        className={`pointer-events-none absolute top-[21px] z-[60] w-[236px] rounded-xl border border-[#60d6ff]/25 bg-[#0c1218] px-3 py-2.5 text-[11px] font-medium normal-case leading-relaxed tracking-normal text-white/75 opacity-0 shadow-[0_18px_50px_-18px_rgba(0,0,0,.9)] transition-opacity duration-150 group-hover:opacity-100 ${
+          align === "right" ? "right-0" : "left-0"
+        }`}
+      >
+        {text}
+      </span>
+    </span>
+  );
+};
+
 /* ------------------------------------------------------------------ shells */
-export const Panel = ({ title, hint, children, right }) => (
+export const Panel = ({ title, hint, tip, children, right }) => (
   <section className="rounded-2xl border border-white/10 bg-[#0b0b0f]">
     <header className="flex items-start justify-between gap-4 border-b border-white/[0.07] px-5 py-4">
       <div>
-        <h3 className="font-display text-[15px] font-bold tracking-tight text-white">{title}</h3>
+        <h3 className="flex items-center font-display text-[15px] font-bold tracking-tight text-white">
+          {title}
+          <Tip text={tip} />
+        </h3>
         {hint && <p className="mt-1 text-[11.5px] leading-relaxed text-white/40">{hint}</p>}
       </div>
       {right}
@@ -22,12 +49,15 @@ export const Panel = ({ title, hint, children, right }) => (
   </section>
 );
 
-export const Row = ({ label, hint, children, htmlFor }) => (
-  <div>
+export const Row = ({ label, hint, tip, children, htmlFor, testId }) => (
+  <div className="min-w-0" data-testid={testId}>
     {label && (
-      <label htmlFor={htmlFor} className="mb-2 block text-[10.5px] font-bold uppercase tracking-[0.16em] text-white/45">
-        {label}
-      </label>
+      <div className="mb-2 flex items-center">
+        <label htmlFor={htmlFor} className="text-[10.5px] font-bold uppercase tracking-[0.16em] text-white/45">
+          {label}
+        </label>
+        <Tip text={tip} />
+      </div>
     )}
     {children}
     {hint && <p className="mt-1.5 text-[11px] leading-relaxed text-white/30">{hint}</p>}
@@ -82,14 +112,17 @@ export const Slider = ({ value, onChange, min = 0, max = 100, step = 1, suffix =
   </div>
 );
 
-export const Toggle = ({ value, onChange, label, hint }) => (
+export const Toggle = ({ value, onChange, label, hint, tip }) => (
   <button
     type="button"
     onClick={() => onChange(!value)}
     className="flex w-full items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3 text-left transition-colors hover:border-white/20"
   >
-    <span>
-      <span className="block text-[13px] font-semibold text-white/85">{label}</span>
+    <span className="min-w-0">
+      <span className="flex items-center text-[13px] font-semibold text-white/85">
+        {label}
+        <Tip text={tip} />
+      </span>
       {hint && <span className="mt-0.5 block text-[11px] text-white/35">{hint}</span>}
     </span>
     <span className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${value ? "bg-[#60d6ff]" : "bg-white/15"}`}>
@@ -116,7 +149,7 @@ export const ColorInput = ({ value, onChange }) => (
       onChange={(e) => onChange(e.target.value)}
       className="h-10 w-12 shrink-0 cursor-pointer rounded-lg border border-white/12 bg-transparent p-1"
     />
-    <input className={inputCls} value={value ?? ""} onChange={(e) => onChange(e.target.value)} placeholder="#60d6ff" />
+    <input type="text" className={inputCls} value={value ?? ""} onChange={(e) => onChange(e.target.value)} placeholder="#60d6ff" />
   </div>
 );
 

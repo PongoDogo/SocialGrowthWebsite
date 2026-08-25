@@ -9,7 +9,7 @@ import httpx
 import json
 from typing import Any, Dict
 
-BASE_URL = "https://9b216d9c-54c0-41fc-81b4-cd78f641e56d.preview.emergentagent.com"
+BASE_URL = "https://cautious-update.preview.emergentagent.com"
 PASSWORD = "mU7P0TEwNI4ozC7L"
 
 # Test state

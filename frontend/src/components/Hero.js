@@ -42,6 +42,9 @@ export const Hero = () => {
     <section
       data-testid="hero"
       id="hero"
+      data-sg="section:hero"
+      data-sg-kind="section"
+      data-sg-label="Ενότητα: Αρχή (Hero)"
       className={`relative overflow-hidden pt-[110px] sm:pt-[150px] lg:pt-[168px] ${HERO_PB[h.padding] || HERO_PB.normal}`}
     >
       {h.bgImage && (
@@ -76,9 +79,9 @@ export const Hero = () => {
         }`}
         style={container(theme)}
       >
-        <div className={`${centered ? "mx-auto max-w-3xl text-center" : ""} ${imageLeft && showImage && !centered ? "lg:order-2" : ""}`}>
+        <div data-sg="hero.textBlock" data-sg-kind="box" data-sg-label="Στήλη κειμένων" className={`${centered ? "mx-auto max-w-3xl text-center" : ""} ${imageLeft && showImage && !centered ? "lg:order-2" : ""}`}>
           {h.showBadge !== false && (
-            <motion.div {...rise(0)} data-testid="hero-badge" className="mb-6 inline-flex items-center gap-2.5 rounded-full border border-white/12 bg-white/[0.04] px-4 py-2 sm:mb-7">
+            <motion.div {...rise(0)} data-testid="hero-badge" data-sg="hero.badge" data-sg-kind="text" data-sg-label="Ετικέτα" className="mb-6 inline-flex items-center gap-2.5 rounded-full border border-white/12 bg-white/[0.04] px-4 py-2 sm:mb-7">
               <span className="relative flex h-1.5 w-1.5">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#4ade80]" />
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#4ade80]" />
@@ -88,9 +91,12 @@ export const Hero = () => {
           )}
 
           <motion.h1 {...rise(0.08)} className="font-display text-[40px] font-extrabold leading-[0.98] tracking-tighter sm:text-6xl lg:text-7xl">
-            {L(h.titleA)}
+            <span data-sg="hero.titleA" data-sg-kind="text" data-sg-label="Τίτλος — 1η γραμμή">{L(h.titleA)}</span>
             <br />
             <span
+              data-sg="hero.titleB"
+              data-sg-kind="text"
+              data-sg-label="Τίτλος — 2η γραμμή"
               className="bg-clip-text text-transparent"
               style={{ backgroundImage: `linear-gradient(90deg, ${accentDeep}, ${accent}, ${accentSoft})` }}
             >
@@ -98,16 +104,19 @@ export const Hero = () => {
             </span>
           </motion.h1>
 
-          <motion.p {...rise(0.16)} className={`mt-6 max-w-xl text-[14.5px] leading-relaxed text-white/55 sm:mt-7 sm:text-base lg:text-lg ${centered ? "mx-auto" : ""}`}>
+          <motion.p {...rise(0.16)} data-sg="hero.sub" data-sg-kind="text" data-sg-label="Υπότιτλος" className={`mt-6 max-w-xl text-[14.5px] leading-relaxed text-white/55 sm:mt-7 sm:text-base lg:text-lg ${centered ? "mx-auto" : ""}`}>
             {L(h.sub)}
           </motion.p>
 
           <motion.div
             {...rise(0.24)}
+            data-sg="hero.buttonsRow"
+            data-sg-kind="box"
+            data-sg-label="Ομάδα κουμπιών"
             className={`mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center ${btnsCentered ? "sm:justify-center" : ""}`}
           >
             {L(h.primary) && (
-              <button data-testid="hero-cta-primary" onClick={() => go(h.primaryTarget || "contact")} className={`w-full sm:w-auto ${pb.className}`} style={pb.style}>
+              <button data-testid="hero-cta-primary" data-sg="hero.primary" data-sg-kind="button" data-sg-label="Κύριο κουμπί" onClick={() => go(h.primaryTarget || "contact")} className={`w-full sm:w-auto ${pb.className}`} style={pb.style}>
                 {L(h.primary)}
                 {btnIcons(theme) && (
                   <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" strokeWidth={2.5} />
@@ -115,7 +124,7 @@ export const Hero = () => {
               </button>
             )}
             {L(h.secondary) && (
-              <button data-testid="hero-cta-secondary" onClick={() => go(h.secondaryTarget || "clients")} className={`w-full sm:w-auto ${sb.className}`} style={sb.style}>
+              <button data-testid="hero-cta-secondary" data-sg="hero.secondary" data-sg-kind="button" data-sg-label="Δεύτερο κουμπί" onClick={() => go(h.secondaryTarget || "clients")} className={`w-full sm:w-auto ${sb.className}`} style={sb.style}>
                 {btnIcons(theme) && <Play className="h-3.5 w-3.5" strokeWidth={2.5} />}
                 {L(h.secondary)}
               </button>
@@ -123,8 +132,8 @@ export const Hero = () => {
           </motion.div>
 
           {platforms.length > 0 && (
-            <motion.div {...rise(0.32)} className="mt-12 sm:mt-14">
-              <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.26em] text-white/35">{L(h.platformsLabel)}</p>
+            <motion.div {...rise(0.32)} data-sg="hero.platformsBlock" data-sg-kind="box" data-sg-label="Σειρά πλατφορμών" className="mt-12 sm:mt-14">
+              <p data-sg="hero.platformsLabel" data-sg-kind="text" data-sg-label="Τίτλος πλατφορμών" className="mb-4 text-[10px] font-bold uppercase tracking-[0.26em] text-white/35">{L(h.platformsLabel)}</p>
               <div className={`flex flex-wrap items-center gap-x-6 gap-y-3 sm:gap-x-7 ${centered ? "justify-center" : ""}`}>
                 {platforms.map((p) => {
                   const Icon = NETWORK_ICONS[p.network] || NETWORK_ICONS.Instagram;
@@ -149,6 +158,9 @@ export const Hero = () => {
           >
             <div className="absolute inset-8 glow-blue blur-2xl" />
             <motion.img
+              data-sg="brand.heroImage"
+              data-sg-kind="image"
+              data-sg-label="Εικόνα Hero"
               src={mediaUrl(c.brand?.heroImage || c.brand?.logo)}
               alt=""
               animate={h.floatImage === false ? undefined : { y: [0, -16, 0] }}

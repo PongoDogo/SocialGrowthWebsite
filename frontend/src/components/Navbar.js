@@ -46,6 +46,9 @@ export const Navbar = () => {
   return (
     <header
       data-testid="navbar"
+      data-sg="section:nav"
+      data-sg-kind="section"
+      data-sg-label="Ενότητα: Μπάρα πλοήγησης"
       className={`${nav.sticky === false ? "absolute" : "fixed"} top-0 left-0 right-0 z-50 transition-colors duration-500 ${
         solid ? `bg-black/70 border-b border-white/10 ${nav.blur === false ? "" : "backdrop-blur-xl"}` : "bg-transparent"
       }`}
@@ -54,16 +57,19 @@ export const Navbar = () => {
         <div className="flex h-[74px] items-center justify-between gap-6">
           <button
             data-testid="brand-logo"
+            data-sg="nav.brand"
+            data-sg-kind="box"
+            data-sg-label="Λογότυπο & όνομα"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             className={`group flex items-center gap-3 ${centerLogo ? "lg:order-2 lg:mx-auto" : ""}`}
           >
             {brand.logo && (
               <span className="relative flex h-10 w-10 items-center justify-center">
                 <span className="absolute inset-0 rounded-xl blur-lg opacity-60 transition-opacity duration-500 group-hover:opacity-100" style={{ backgroundColor: `${accent}33` }} />
-                <img src={mediaUrl(brand.logo)} alt={`${brand.name || ""}${brand.nameAccent || ""}`} className="relative h-10 w-10 object-contain" />
+                <img data-sg="brand.logo" data-sg-kind="image" data-sg-label="Λογότυπο" src={mediaUrl(brand.logo)} alt={`${brand.name || ""}${brand.nameAccent || ""}`} className="relative h-10 w-10 object-contain" />
               </span>
             )}
-            <span className="font-display text-[19px] font-extrabold leading-none tracking-tight">
+            <span data-sg="brand.name" data-sg-kind="text" data-sg-label="Όνομα εταιρίας" className="font-display text-[19px] font-extrabold leading-none tracking-tight">
               {brand.name}
               <span style={{ color: accent }}>{brand.nameAccent}</span>
             </span>
@@ -74,6 +80,9 @@ export const Navbar = () => {
               <button
                 key={l.id}
                 data-testid={`nav-${l.target || l.id}`}
+                data-sg={`nav.items.${l._i}.label`}
+                data-sg-kind="text"
+                data-sg-label="Link μενού"
                 onClick={() => onLink(l)}
                 className="rounded-full px-4 py-2 text-sm font-medium text-white/60 transition-colors duration-300 hover:bg-white/5 hover:text-white"
               >
@@ -97,6 +106,9 @@ export const Navbar = () => {
             {nav.showCta !== false && (
               <button
                 data-testid="nav-cta"
+                data-sg="nav.cta"
+                data-sg-kind="button"
+                data-sg-label="Κουμπί navbar (CTA)"
                 onClick={() => go("contact")}
                 className={`hidden lg:flex ${pb.className} !px-5 !py-2.5 !text-sm`}
                 style={pb.style}

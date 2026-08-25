@@ -34,9 +34,12 @@ const Counter = ({ value, suffix, duration = 2100 }) => {
   );
 };
 
-const StatCard = ({ value, suffix, label, accent, i, theme, centered }) => (
+const StatCard = ({ value, suffix, label, accent, i, theme, centered, path }) => (
   <motion.div
     data-testid={`stat-card-${i}`}
+    data-sg={path}
+    data-sg-kind="card"
+    data-sg-label={`Κάρτα νούμερου ${i + 1}`}
     initial={{ opacity: 0, y: 28 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true, margin: "-60px" }}
@@ -63,13 +66,13 @@ const StatCard = ({ value, suffix, label, accent, i, theme, centered }) => (
         style={{ backgroundColor: accent }}
       />
 
-      <span className="relative block font-display text-[10px] font-extrabold tracking-[0.26em] text-white/25">{String(i + 1).padStart(2, "0")}</span>
+            <span className="relative block font-display text-[10px] font-extrabold tracking-[0.26em] text-white/25">{String(i + 1).padStart(2, "0")}</span>
 
-      <div className="relative mt-5 font-display text-[42px] font-extrabold leading-none tracking-tighter sm:mt-7 sm:text-[56px] lg:text-[60px]" style={{ color: accent }}>
+      <div data-sg={`${path}.value`} data-sg-kind="number" data-sg-label="Αριθμός" className="relative mt-5 font-display text-[42px] font-extrabold leading-none tracking-tighter sm:mt-7 sm:text-[56px] lg:text-[60px]" style={{ color: accent }}>
         <Counter value={value} suffix={suffix} />
       </div>
 
-      <p className="relative mt-4 text-[13px] font-medium leading-snug text-white/50 sm:mt-5 sm:text-sm">{label}</p>
+      <p data-sg={`${path}.label`} data-sg-kind="text" data-sg-label="Ετικέτα νούμερου" className="relative mt-4 text-[13px] font-medium leading-snug text-white/50 sm:mt-5 sm:text-sm">{label}</p>
 
       <div className="relative mt-6 h-px w-full overflow-hidden bg-white/[0.07] sm:mt-8">
         <motion.span
@@ -98,7 +101,14 @@ export const Stats = () => {
   const centered = st.align === "center";
 
   return (
-    <section data-testid="results" id="results" className={`relative overflow-hidden border-y border-white/[0.07] ${pad(st.padding)}`}>
+    <section
+      data-testid="results"
+      id="results"
+      data-sg="section:stats"
+      data-sg-kind="section"
+      data-sg-label="Ενότητα: Νούμερα"
+      className={`relative overflow-hidden border-y border-white/[0.07] ${pad(st.padding)}`}
+    >
       {theme.glows !== false && <div className="pointer-events-none absolute left-1/2 top-0 h-[420px] w-[1000px] -translate-x-1/2 glow-blue opacity-60" />}
       {theme.gridLines !== false && (
         <div
@@ -117,10 +127,10 @@ export const Stats = () => {
       <div className="relative mx-auto px-6 sm:px-8" style={container(theme)}>
         <div className={`flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between sm:gap-6 ${centered ? "sm:flex-col sm:items-center" : ""}`}>
           <div className={`max-w-2xl ${headBox(st.align)}`}>
-            <p className="text-[10px] font-bold uppercase tracking-[0.26em] sm:text-[11px]" style={{ color: accent }}>{L(st.overline)}</p>
-            <h2 className="mt-4 font-display text-[26px] font-extrabold leading-[1.12] tracking-tight sm:text-4xl lg:text-5xl">{L(st.title)}</h2>
+            <p data-sg="stats.overline" data-sg-kind="text" data-sg-label="Μικρός τίτλος" className="text-[10px] font-bold uppercase tracking-[0.26em] sm:text-[11px]" style={{ color: accent }}>{L(st.overline)}</p>
+            <h2 data-sg="stats.title" data-sg-kind="text" data-sg-label="Τίτλος ενότητας" className="mt-4 font-display text-[26px] font-extrabold leading-[1.12] tracking-tight sm:text-4xl lg:text-5xl">{L(st.title)}</h2>
           </div>
-          <p className={`max-w-xs text-[12.5px] leading-relaxed text-white/40 sm:text-sm ${centered ? "text-center" : ""}`}>{L(st.note)}</p>
+          <p data-sg="stats.note" data-sg-kind="text" data-sg-label="Σημείωση" className={`max-w-xs text-[12.5px] leading-relaxed text-white/40 sm:text-sm ${centered ? "text-center" : ""}`}>{L(st.note)}</p>
         </div>
 
         <div className={`mt-10 grid gap-3 sm:mt-16 sm:gap-4 lg:gap-5 ${cols}`}>
@@ -128,6 +138,7 @@ export const Stats = () => {
             <StatCard
               key={s.id || i}
               i={i}
+              path={`stats.items.${s._i}`}
               theme={theme}
               centered={centered}
               value={s.autoClients ? clientCount : Number(s.value) || 0}

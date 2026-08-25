@@ -41,6 +41,26 @@ export const move = (arr, from, to) => {
   return out;
 };
 
+/* --------------------------------------------------------------------- styles
+ * A style value set back to "Αυτόματο" stays on the object as `undefined`
+ * (setIn cannot delete keys), so anything that counts overrides has to skip
+ * those or an element looks "τροποποιημένο" for ever.
+ */
+const isRealValue = (v) =>
+  v !== undefined && v !== null && v !== "" && v !== false && !(typeof v === "number" && Number.isNaN(v));
+
+/** How many real overrides live inside one device config (hover included). */
+export const countStyleValues = (devCfg) => {
+  if (!devCfg || typeof devCfg !== "object") return 0;
+  return Object.entries(devCfg).reduce((n, [k, v]) => {
+    if (k === "hover") return n + countStyleValues(v);
+    return n + (isRealValue(v) ? 1 : 0);
+  }, 0);
+};
+
+/** How many real overrides one `styles[path]` entry holds across all devices. */
+export const countStyleEntry = (cfg) => ["d", "t", "m"].reduce((sum, dev) => sum + countStyleValues(cfg?.[dev]), 0);
+
 export const fmtDate = (iso) => {
   if (!iso) return "—";
   try {
