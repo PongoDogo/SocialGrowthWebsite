@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import * as Icons from "lucide-react";
 import { Row, Grid, Select, Slider, ColorInput, NumberInput, Toggle, Tip, ImagePicker } from "@/studio/fields";
 import { FONTS } from "@/content/style";
+import { ANIMS } from "@/content/StyleOverrides";
 import { countStyleValues } from "@/studio/util";
 
 /* Desktop is the base; tablet applies under 1024px, mobile under 768px. */
@@ -148,6 +149,19 @@ const BG_POS = [
   { value: "bottom", label: "Κάτω" },
   { value: "left", label: "Αριστερά" },
   { value: "right", label: "Δεξιά" },
+];
+
+const ANIM_OPTIONS = [
+  { value: "", label: "Καμία κίνηση" },
+  ...Object.entries(ANIMS).map(([value, v]) => ({ value, label: v.label })),
+];
+
+const EASE_OPTIONS = [
+  { value: "", label: "Ομαλή (προτεινόμενη)" },
+  { value: "spring", label: "Ελατήριο (με αναπήδηση)" },
+  { value: "out", label: "Φρενάρει στο τέλος" },
+  { value: "in", label: "Επιταχύνει στο τέλος" },
+  { value: "linear", label: "Σταθερή" },
 ];
 
 /** Numeric field that can be "auto" (unset). */
@@ -670,6 +684,57 @@ export const StyleEditor = ({ path, styles, kind = "box", onSet, onReset, onCopy
               </Row>
             </div>
           </div>
+        )}
+      </Group>
+
+      {/* ------------------------------------------------------------ motion */}
+      <Group
+        title="Κίνηση (animation)"
+        tid="style-group-anim"
+        icon="Sparkles"
+        tip="Δώσε στο στοιχείο κίνηση εμφάνισης ή μια συνεχή κίνηση. Δουλεύει μαζί με τη θέση και το hover — δεν ακυρώνει τίποτα."
+        count={countKeys(s, ["anim", "animDur", "animDelay", "animEase", "animDist", "animTrigger", "animColor", "animOpacity"])}
+      >
+        <Row label="Είδος κίνησης" tip="Οι πρώτες τρέχουν μία φορά όταν εμφανίζεται το στοιχείο. Οι «συνεχές» δεν σταματούν ποτέ — χρησιμοποίησέ τις με μέτρο, σε 1-2 διακοσμητικά στοιχεία.">
+          <Select value={s.anim || ""} onChange={(v) => set("anim")(v || undefined)} options={ANIM_OPTIONS} />
+        </Row>
+
+        {s.anim ? (
+          <>
+            <Row label="Πότε ξεκινά" tip="«Μόλις φανεί» είναι το πιο εντυπωσιακό: η κίνηση τρέχει όταν ο επισκέπτης κατεβαίνει και το στοιχείο μπαίνει στην οθόνη.">
+              <Select
+                value={s.animTrigger || "view"}
+                onChange={(v) => set("animTrigger")(v || undefined)}
+                options={[
+                  { value: "view", label: "Μόλις φανεί στην οθόνη" },
+                  { value: "load", label: "Αμέσως με τη φόρτωση" },
+                ]}
+              />
+            </Row>
+            <Grid>
+              <OptNum tid="opt-animdur" label="Διάρκεια" tip="Πόσο διαρκεί η κίνηση. 500-900ms δείχνει φυσικό· πάνω από 1500ms κουράζει." value={s.animDur} onChange={set("animDur")} min={100} max={4000} step={50} suffix="ms" preset={700} />
+              <OptNum tid="opt-animdelay" label="Καθυστέρηση" tip="Περιμένει τόσο πριν ξεκινήσει. Δίνοντας 0/100/200ms σε διαδοχικά στοιχεία φτιάχνεις εφέ «σκάλας»." value={s.animDelay} onChange={set("animDelay")} min={0} max={3000} step={50} suffix="ms" preset={150} />
+            </Grid>
+            <Grid>
+              <OptNum tid="opt-animdist" label="Έντασή / απόσταση" tip="Πόσο μακριά ξεκινάει ή πόσο έντονη είναι η συνεχής κίνηση. Μικρές τιμές δείχνουν πιο κομψές." value={s.animDist} onChange={set("animDist")} min={2} max={160} suffix="px" preset={26} />
+              <Row label="Καμπύλη" tip="Πώς επιταχύνει. «Ελατήριο» κάνει μια μικρή υπέρβαση στο τέλος και δείχνει πιο ζωντανό.">
+                <Select value={s.animEase || ""} onChange={(v) => set("animEase")(v || undefined)} options={EASE_OPTIONS} />
+              </Row>
+            </Grid>
+            {s.anim === "glowLoop" && (
+              <Row label="Χρώμα λάμψης" tip="Το χρώμα του παλμού. Κενό = το γαλάζιο του Studio.">
+                <ColorInput value={s.animColor || ""} onChange={(v) => set("animColor")(v || undefined)} />
+              </Row>
+            )}
+            <Toggle
+              value={s.animOpacity === false}
+              onChange={(v) => set("animOpacity")(v ? false : undefined)}
+              label="Χωρίς σβήσιμο/εμφάνιση"
+              tip="Από προεπιλογή το στοιχείο εμφανίζεται σβήνοντας μέσα. Άνοιξέ το αν θέλεις μόνο την κίνηση, χωρίς αλλαγή διαφάνειας."
+            />
+          </>
+        ) : (
+          <p className="text-[11px] leading-relaxed text-white/35">Διάλεξε είδος κίνησης για να εμφανιστούν οι ρυθμίσεις.</p>
         )}
       </Group>
 

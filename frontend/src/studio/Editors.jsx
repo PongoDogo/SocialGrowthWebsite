@@ -188,10 +188,43 @@ export const ThemeEditor = ({ d, set }) => (
       </Row>
     </Panel>
 
+    <Panel
+      title="Κείμενα — χρώματα σε όλο το site"
+      hint="Αλλάζει με μία κίνηση το χρώμα κάθε κειμένου. Άφησε κενό ό,τι θέλεις να μείνει όπως είναι."
+      tip="Εδώ βάφεις ΟΛΑ τα κείμενα μαζί. Αν θέλεις να αλλάξεις ένα μεμονωμένο κείμενο, πάτα το μέσα στο preview και χρησιμοποίησε τα «Χρώματα» του στοιχείου — εκείνο υπερισχύει."
+    >
+      <Grid>
+        <Row label="Χρώμα τίτλων" tip="Ισχύει για όλους τους τίτλους και τις μεγάλες επικεφαλίδες του site.">
+          <ColorInput value={d.theme?.text?.heading || ""} onChange={(v) => set("theme.text.heading", v)} />
+        </Row>
+        <Row label="Χρώμα κειμένων" tip="Το κύριο χρώμα για τα κανονικά κείμενα και τις έντονες λέξεις.">
+          <ColorInput value={d.theme?.text?.body || ""} onChange={(v) => set("theme.text.body", v)} />
+        </Row>
+      </Grid>
+      <Row label="Χρώμα δεύτερης σειράς" tip="Τα πιο ξεθωριασμένα κείμενα: υπότιτλοι, περιγραφές, βοηθητικά λόγια. Διάλεξε κάτι πιο απαλό από το κύριο χρώμα.">
+        <ColorInput value={d.theme?.text?.muted || ""} onChange={(v) => set("theme.text.muted", v)} />
+      </Row>
+      <Grid>
+        <Row label="Ύψος γραμμής" tip="Το κενό ανάμεσα στις γραμμές σε όλα τα κείμενα. Γύρω στο 1.6 διαβάζεται πολύ άνετα. Άφησέ το στο 0 για αυτόματο.">
+          <Slider value={d.theme?.text?.lineHeight ?? 0} onChange={(v) => set("theme.text.lineHeight", v || undefined)} min={0} max={2.4} step={0.05} />
+        </Row>
+        <Row label="Απόσταση γραμμάτων τίτλων" tip="Σφίγγει ή αραιώνει τα γράμματα σε όλους τους τίτλους. Λίγο αρνητικό δίνει πιο «premium» αποτέλεσμα.">
+          <Slider value={d.theme?.text?.headingTracking ?? 0} onChange={(v) => set("theme.text.headingTracking", v)} min={-4} max={8} step={0.25} suffix="px" />
+        </Row>
+      </Grid>
+    </Panel>
+
     <Panel title="Εφέ" hint="Απενεργοποίησε ό,τι δεν σου αρέσει — το site παραμένει καθαρό.">
       <Toggle value={d.theme?.grain !== false} onChange={(v) => set("theme.grain", v)} label="Υφή κόκκου (grain)" hint="Λεπτή υφή πάνω από όλο το site" />
       <Toggle value={d.theme?.glows !== false} onChange={(v) => set("theme.glows", v)} label="Φωτεινές λάμψεις" hint="Τα χρωματιστά θολά φώτα στο background" />
       <Toggle value={d.theme?.gridLines !== false} onChange={(v) => set("theme.gridLines", v)} label="Γραμμές καννάβου" hint="Το διακριτικό grid στην αρχή και στα νούμερα" />
+      <Toggle
+        value={d.theme?.motion !== false}
+        onChange={(v) => set("theme.motion", v)}
+        label="Ενσωματωμένες κινήσεις"
+        hint="Οι έτοιμες κινήσεις εμφάνισης του site"
+        tip="Αυτές είναι οι κινήσεις που ήρθαν με το site (τα κείμενα της αρχής ανεβαίνουν, τα βήματα εμφανίζονται στο scroll). Κλείσ' τες αν θέλεις να μείνουν μόνο οι δικές σου κινήσεις από την ομάδα «Κίνηση» κάθε στοιχείου."
+      />
     </Panel>
   </div>
 );
@@ -534,6 +567,20 @@ export const ClientsEditor = ({ d, set }) => (
         />
       </Row>
       <Toggle value={d.clients?.pauseOnHover !== false} onChange={(v) => set("clients.pauseOnHover", v)} label="Πάγωμα στο hover" tip="Η σειρά σταματάει απαλά όταν ο επισκέπτης βάλει το ποντίκι πάνω, για να δει το λογότυπο." />
+      {d.clients?.pauseOnHover !== false && (
+        <Row label="Ρελαντί στο hover" tip="0% = σταματάει τελείως. Λίγα τοις εκατό κρατούν μια αργή, «ζωντανή» κίνηση ενώ ο επισκέπτης κοιτάζει — δείχνει πιο δουλεμένο.">
+          <Slider value={d.clients?.hoverSpeed ?? 0} onChange={(v) => set("clients.hoverSpeed", v)} min={0} max={60} suffix="%" />
+        </Row>
+      )}
+      <Row label="Ομαλότητα φρένου" tip="Πόσο μαλακά επιταχύνει και φρενάρει η σειρά. Μικρός αριθμός = πολύ βελούδινο και αργό, μεγάλος = πιο απότομο.">
+        <Slider value={d.clients?.brake ?? 7} onChange={(v) => set("clients.brake", v)} min={1} max={20} />
+      </Row>
+      <Toggle
+        value={d.clients?.drag === true}
+        onChange={(v) => set("clients.drag", v)}
+        label="Να γυρίζει με σύρσιμο"
+        tip="Ο επισκέπτης μπορεί να σύρει τη σειρά με το ποντίκι ή το δάχτυλο, και συνεχίζει με αδράνεια όταν την αφήσει. Μέσα στο Studio σε «Επιλογή» είναι ανενεργό, ώστε να μη μπερδεύεται με το click-to-edit."
+      />
       <Toggle value={d.clients?.showNames !== false} onChange={(v) => set("clients.showNames", v)} label="Εμφάνιση ονομάτων" tip="Το όνομα του μαγαζιού κάτω από το λογότυπο. Κλείσ' το για πιο καθαρό, μόνο-λογότυπα look." />
       <Toggle value={d.clients?.showSocials !== false} onChange={(v) => set("clients.showSocials", v)} label="Εμφάνιση social εικονιδίων" tip="Τα μικρά εικονίδια Instagram / TikTok σε κάθε κάρτα. Εμφανίζονται μόνο για τα μαγαζιά που έχεις συμπληρώσει username." />
       <Row label="Θέση social εικονιδίων" tip="Πού μπαίνουν τα εικονίδια μέσα στην κάρτα σε σχέση με το λογότυπο και το όνομα.">
@@ -564,6 +611,96 @@ export const ClientsEditor = ({ d, set }) => (
       </Grid>
       <Row label="Μέγεθος λογοτύπων" tip="Πόσο χώρο πιάνει το λογότυπο μέσα στην κάρτα. Χαμήλωσέ το αν κάποια λογότυπα φαίνονται να «πνίγονται» στην κάρτα.">
         <Slider value={d.clients?.logoMax ?? 100} onChange={(v) => set("clients.logoMax", v)} min={60} max={150} suffix="%" />
+      </Row>
+      <Grid>
+        <Row label="Κατεύθυνση" tip="Προς ποια πλευρά κυλάει κάθε σειρά. Το «Εναλλάξ» δίνει το κλασικό αποτέλεσμα όπου οι σειρές κινούνται αντίθετα και το μάτι δεν κουράζεται.">
+          <Select
+            value={d.clients?.direction || "alternate"}
+            onChange={(v) => set("clients.direction", v)}
+            options={[
+              { value: "alternate", label: "Εναλλάξ (μία δεξιά, μία αριστερά)" },
+              { value: "left", label: "Όλες προς τα αριστερά" },
+              { value: "right", label: "Όλες προς τα δεξιά" },
+              { value: "manual", label: "Χειροκίνητα ανά σειρά" },
+            ]}
+          />
+        </Row>
+        <Row label="Ποικιλία ταχύτητας" tip="Δίνει σε κάθε σειρά ελαφρώς διαφορετική ταχύτητα, ώστε να μη μοιάζουν μηχανικές. 0% = όλες ακριβώς ίδιες.">
+          <Slider value={d.clients?.rowVariety ?? 18} onChange={(v) => set("clients.rowVariety", v)} min={0} max={70} suffix="%" />
+        </Row>
+      </Grid>
+      {(d.clients?.direction || "alternate") === "manual" && (
+        <div className="rounded-lg border border-white/[0.07] p-3">
+          <p className="mb-2.5 flex items-center text-[11px] font-bold uppercase tracking-[0.14em] text-white/40">
+            Κατεύθυνση κάθε σειράς
+          </p>
+          <div className="space-y-2">
+            {Array.from({ length: Math.max(1, Math.min(4, Number(d.clients?.rows) || 3)) }).map((_, i) => {
+              const dirs = Array.isArray(d.clients?.rowDirs) ? d.clients.rowDirs : [];
+              const rev = !!dirs[i];
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => {
+                    const next = [...dirs];
+                    while (next.length < 4) next.push(false);
+                    next[i] = !rev;
+                    set("clients.rowDirs", next);
+                  }}
+                  className="flex w-full items-center justify-between rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2 text-left transition-colors hover:border-white/25"
+                >
+                  <span className="text-[12.5px] font-semibold text-white/75">Σειρά {i + 1}</span>
+                  <span className="flex items-center gap-1.5 text-[11.5px] font-bold text-[#60d6ff]">
+                    {rev ? "Προς τα δεξιά →" : "← Προς τα αριστερά"}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </Panel>
+
+    <Panel
+      title="Αντίδραση καρτών στο ποντίκι"
+      hint="Τι κάνει η κάρτα του μαγαζιού όταν ο επισκέπτης περνάει από πάνω."
+      tip="Κράτα τα διακριτικά: μικρό ανασήκωμα και λίγη λάμψη δείχνουν πολύ πιο ακριβά από μεγάλες κινήσεις."
+    >
+      <Grid>
+        <Row label="Ανασήκωμα" tip="Πόσα pixel σηκώνεται η κάρτα. Γύρω στα 6px είναι το γλυκό σημείο.">
+          <Slider value={d.clients?.cardHover?.lift ?? 6} onChange={(v) => set("clients.cardHover.lift", v)} min={0} max={30} suffix="px" />
+        </Row>
+        <Row label="Μεγέθυνση" tip="100% = καμία μεγέθυνση. 103-106% δίνει διακριτικό «ζωντάνεμα».">
+          <Slider value={d.clients?.cardHover?.scale ?? 100} onChange={(v) => set("clients.cardHover.scale", v)} min={90} max={130} suffix="%" />
+        </Row>
+      </Grid>
+      <Grid>
+        <Row label="Κλίση 3D" tip="Γέρνει ελαφρώς την κάρτα σε προοπτική, σαν να σηκώνεται προς εσένα. 4-8 μοίρες αρκούν.">
+          <Slider value={d.clients?.cardHover?.tilt ?? 0} onChange={(v) => set("clients.cardHover.tilt", v)} min={0} max={20} suffix="°" />
+        </Row>
+        <Row label="Λάμψη" tip="Φωτεινό γλόου γύρω από την κάρτα. 0 = καμία.">
+          <Slider value={d.clients?.cardHover?.glow ?? 0} onChange={(v) => set("clients.cardHover.glow", v)} min={0} max={80} suffix="px" />
+        </Row>
+      </Grid>
+      <Grid>
+        <Row label="Χρώμα λάμψης" tip="Άφησέ το κενό για να χρησιμοποιεί το χρώμα του κάθε μαγαζιού.">
+          <ColorInput value={d.clients?.cardHover?.glowColor || ""} onChange={(v) => set("clients.cardHover.glowColor", v)} />
+        </Row>
+        <Row label="Χρώμα περιγράμματος" tip="Το περίγραμμα της κάρτας στο hover. Κενό = το χρώμα του μαγαζιού.">
+          <ColorInput value={d.clients?.cardHover?.borderColor || ""} onChange={(v) => set("clients.cardHover.borderColor", v)} />
+        </Row>
+      </Grid>
+      <Grid>
+        <Row label="Λογότυπα ασπρόμαυρα" tip="Πόσο ασπρόμαυρα δείχνουν τα λογότυπα ΚΑΝΟΝΙΚΑ. Βάλε 100% εδώ και 0% δίπλα, για να παίρνουν χρώμα μόνο στο hover — δείχνει πολύ κομψό.">
+          <Slider value={d.clients?.cardHover?.grayscale ?? 0} onChange={(v) => set("clients.cardHover.grayscale", v)} min={0} max={100} suffix="%" />
+        </Row>
+        <Row label="Ασπρόμαυρα στο hover" tip="Πόσο ασπρόμαυρο δείχνει το λογότυπο ΟΤΑΝ περνάς το ποντίκι. Συνήθως 0%.">
+          <Slider value={d.clients?.cardHover?.grayscaleHover ?? 0} onChange={(v) => set("clients.cardHover.grayscaleHover", v)} min={0} max={100} suffix="%" />
+        </Row>
+      </Grid>
+      <Row label="Ταχύτητα κίνησης" tip="Πόσο γρήγορα γίνεται η αλλαγή στο hover. 300-500ms δείχνει βελούδινο.">
+        <Slider value={d.clients?.cardHover?.speed ?? 500} onChange={(v) => set("clients.cardHover.speed", v)} min={80} max={1200} step={20} suffix="ms" />
       </Row>
     </Panel>
 

@@ -190,6 +190,13 @@ export const PreviewBridge = () => {
       if (!m || typeof m !== "object") return;
       if (m.type === "sg-edit-mode") {
         state.current.edit = !!m.edit;
+        /* lets the carousel (and anything else) know not to steal mousedown */
+        try {
+          if (m.edit) document.documentElement.dataset.sgEdit = "1";
+          else delete document.documentElement.dataset.sgEdit;
+        } catch {
+          /* ignore */
+        }
         if (!m.edit) {
           state.current.hover = null;
           document.body.style.cursor = "";

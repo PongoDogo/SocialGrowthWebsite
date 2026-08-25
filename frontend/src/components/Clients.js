@@ -8,7 +8,7 @@ import { Marquee } from "@/components/Marquee";
 import { container, pad, headBox, surfaceBg, ring, iconBox, iconScale, hexToRgba } from "@/content/style";
 
 const FALLBACK = ["#60d6ff", "#facc15", "#4ade80", "#f87171", "#a78bfa"];
-const ROW_FACTORS = [1, 0.84, 1.14, 0.92];
+/* row speed variety is now driven by clients.rowVariety (see Clients below) */
 const CARD_SIZES = {
   sm: { h: 132, w: 166, hSm: 148, wSm: 190 },
   md: { h: 158, w: 196, hSm: 176, wSm: 226 },
@@ -76,6 +76,29 @@ const ClientCard = ({ c, i, lang, cl, theme, size, gap, darkTiles }) => {
       </span>
     ) : null;
 
+  /* ---- editable card hover reaction (all opt-in, defaults keep the old look) */
+  const hv = cl.cardHover || {};
+  const lift = Number(hv.lift ?? 6);
+  const hScale = Number(hv.scale ?? 100) / 100;
+  const tilt = Number(hv.tilt ?? 0);
+  const glow = Number(hv.glow ?? 0);
+  const dur = Math.max(0, Math.min(2000, Number(hv.speed ?? 500)));
+  const grayRest = Number(hv.grayscale ?? 0);
+  const grayHot = Number(hv.grayscaleHover ?? 0);
+
+  const cardTransform = hot
+    ? [
+        tilt ? `perspective(760px) rotateX(${tilt}deg)` : "",
+        lift ? `translateY(${-lift}px)` : "",
+        hScale !== 1 ? `scale(${hScale})` : "",
+      ]
+        .filter(Boolean)
+        .join(" ") || "none"
+    : "none";
+
+  const glowShadow = glow ? `, 0 0 ${glow}px ${hv.glowColor || accent}` : "";
+  const logoFilter = `grayscale(${(hot ? grayHot : grayRest) / 100})`;
+
   return (
     <div
       data-testid={`client-card-${c.id}`}
@@ -85,7 +108,7 @@ const ClientCard = ({ c, i, lang, cl, theme, size, gap, darkTiles }) => {
       title={label}
       onMouseEnter={() => setHot(true)}
       onMouseLeave={() => setHot(false)}
-      className="group relative flex shrink-0 flex-col items-center justify-center gap-3 overflow-hidden px-5 transition-transform duration-500 hover:-translate-y-1.5"
+      className="group relative flex shrink-0 flex-col items-center justify-center gap-3 overflow-hidden px-5"
       style={{
         height: size.h,
         width: size.w,
@@ -93,12 +116,13 @@ const ClientCard = ({ c, i, lang, cl, theme, size, gap, darkTiles }) => {
         marginRight: gap / 2,
         backgroundColor: darkTiles ? theme.tileColor || "#101218" : surfaceBg(theme),
         borderRadius: radius,
+        transform: cardTransform,
         boxShadow: hot
-          ? `inset 0 0 0 1px ${accent}80, 0 18px 46px -22px ${accent}80`
+          ? `inset 0 0 0 1px ${hv.borderColor || `${accent}80`}, 0 18px 46px -22px ${accent}80${glowShadow}`
           : darkTiles
           ? "inset 0 0 0 1px rgba(255,255,255,0.08)"
           : ring(theme),
-        transition: "box-shadow .5s ease, transform .5s ease",
+        transition: `box-shadow ${dur}ms cubic-bezier(.2,.7,.2,1), transform ${dur}ms cubic-bezier(.2,.7,.2,1)`,
       }}
     >
       <span
@@ -134,6 +158,7 @@ const ClientCard = ({ c, i, lang, cl, theme, size, gap, darkTiles }) => {
             decoding="async"
             draggable={false}
             onError={() => setBroken(true)}
+            data-testid="client-logo"
             className={
               c.tile
                 ? "object-contain transition-transform duration-500 group-hover:scale-[1.09]"
@@ -141,8 +166,8 @@ const ClientCard = ({ c, i, lang, cl, theme, size, gap, darkTiles }) => {
             }
             style={
               c.tile
-                ? { height: 76 * k, width: 76 * k, maxWidth: "80%" }
-                : { maxHeight: 76 * k, maxWidth: `min(${176 * k}px, 88%)` }
+                ? { height: 76 * k, width: 76 * k, maxWidth: "80%", filter: logoFilter, transitionDuration: `${dur}ms` }
+                : { maxHeight: 76 * k, maxWidth: `min(${176 * k}px, 88%)`, filter: logoFilter, transitionDuration: `${dur}ms` }
             }
           />
         </span>
@@ -182,6 +207,21 @@ export const Clients = () => {
   const gap = Math.max(0, Math.min(60, cl.gap ?? 20));
   const fade = Math.max(0, Math.min(22, cl.fadeEdges ?? 7));
   const [narrow, setNarrow] = useState(typeof window !== "undefined" ? window.innerWidth < 640 : false);
+
+  /* direction: all one way, alternating, or hand-picked per row */
+  const dirMode = cl.direction || "alternate";
+  const rowDirs = Array.isArray(cl.rowDirs) ? cl.rowDirs : [];
+  const isReverse = (i) => {
+    if (dirMode === "left") return false;
+    if (dirMode === "right") return true;
+    if (dirMode === "manual") return !!rowDirs[i];
+    return i % 2 === 1;
+  };
+
+  /* speed variety between rows — 0 makes every row identical */
+  const variety = Math.max(0, Math.min(80, cl.rowVariety ?? 18)) / 100;
+  const SEQ = [1, -0.6, 0.35, -0.85];
+  const rowSpeed = (i) => Math.max(0.2, 1 + SEQ[i % SEQ.length] * variety);
 
   useEffect(() => {
     const onR = () => setNarrow(window.innerWidth < 640);
@@ -253,9 +293,12 @@ export const Clients = () => {
         {rows.map((rowItems, i) => (
           <Marquee
             key={i}
-            pxPerSecond={basePx * ROW_FACTORS[i % ROW_FACTORS.length]}
-            reverse={i % 2 === 1}
+            pxPerSecond={basePx * rowSpeed(i)}
+            reverse={isReverse(i)}
             pauseOnHover={cl.pauseOnHover !== false}
+            hoverSpeed={cl.hoverSpeed ?? 0}
+            brake={cl.brake ?? 7}
+            draggable={cl.drag === true}
             fade={fade}
           >
             {rowItems.map((it, j) => (

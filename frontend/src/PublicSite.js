@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { MotionConfig } from "framer-motion";
 import { LangProvider, useLang } from "@/i18n";
 import { ContentProvider, useSite } from "@/content/ContentContext";
 import { sectionOrder } from "@/content/SectionShell";
@@ -52,6 +53,7 @@ const SiteBody = () => {
   }, [c.seo, L]);
 
   return (
+    <MotionConfig reducedMotion={theme.motion === false ? "always" : "never"}>
     <div
       className={`App ${theme.grain === false ? "" : "grain"} ${theme.mode === "light" ? "sg-light" : ""}`}
       data-testid="app-root"
@@ -73,6 +75,7 @@ const SiteBody = () => {
       </main>
       {!hiddenIds.includes("footer") && <Footer />}
     </div>
+    </MotionConfig>
   );
 };
 

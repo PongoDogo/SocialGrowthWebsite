@@ -1,5 +1,5 @@
 /** Turns the editable `styles` map into real CSS (3 breakpoints + hover), plus optional light-mode ink. */
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 
 const num = (v) => (v === "" || v === null || v === undefined || Number.isNaN(Number(v)) ? null : Number(v));
 const has = (v) => v !== undefined && v !== null && v !== "";
@@ -79,7 +79,7 @@ export const declarations = (s, opts = {}) => {
     push("-webkit-text-fill-color", s.color);
     if (s.clearGradient) push("background-image", "none");
   }
-  if (num(s.opacity) !== null && num(s.opacity) !== 100) push("opacity", String(num(s.opacity) / 100));
+  if (!opts.animated && num(s.opacity) !== null && num(s.opacity) !== 100) push("opacity", String(num(s.opacity) / 100));
 
   /* ---- background: colour, then gradient, then image (last one wins on purpose) */
   if (s.bg) push("background-color", s.bg);
@@ -109,7 +109,7 @@ export const declarations = (s, opts = {}) => {
   if (num(s.grayscale)) filters.push(`grayscale(${num(s.grayscale)}%)`);
   if (num(s.brightness) !== null && num(s.brightness) !== 100) filters.push(`brightness(${num(s.brightness)}%)`);
   if (num(s.saturate) !== null && num(s.saturate) !== 100) filters.push(`saturate(${num(s.saturate)}%)`);
-  if (filters.length) push("filter", filters.join(" "));
+  if (filters.length && !opts.animated) push("filter", filters.join(" "));
   if (num(s.backdropBlur)) {
     push("backdrop-filter", `blur(${num(s.backdropBlur)}px)`);
     push("-webkit-backdrop-filter", `blur(${num(s.backdropBlur)}px)`);
@@ -224,7 +224,7 @@ export const declarations = (s, opts = {}) => {
   }
 
   /* ---- transform (skipped for hover, which merges with the base first) */
-  if (!opts.skipTransform) {
+  if (!opts.skipTransform && !opts.animated) {
     const tr = transformList(s);
     if (tr.length) push("transform", tr.join(" "));
   }
@@ -268,7 +268,158 @@ export const hoverDeclarations = (base, hv) => {
   return parts.join(";");
 };
 
-/* --------------------------------------------------------------- light mode */
+const rgbaOf = (hex, alpha) => {
+  const t = hexToTriple(hex, "255 255 255");
+  return `rgb(${t} / ${alpha})`;
+};
+
+/* ------------------------------------------------------- global text colours
+ * The site paints text with Tailwind's white/alpha utilities, so recolouring
+ * "every text" means remapping those utilities — in ANY theme mode. Emitted
+ * before the per-element rules so a single element can still override it.
+ */
+const ALPHAS = [5, 8, 10, 12, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90];
+
+const textCss = (theme) => {
+  const t = theme?.text || {};
+  const { body, heading, muted } = t;
+  const lh = num(t.lineHeight);
+  const tr = num(t.headingTracking);
+  if (!body && !heading && !muted && lh === null && tr === null) return "";
+
+  const lines = [];
+  if (body) {
+    lines.push(`body, .text-white{color:${body} !important}`);
+    lines.push(`.text-white{-webkit-text-fill-color:${body} !important}`);
+  }
+  /* low alphas are the "faded" texts, high alphas follow the main colour */
+  ALPHAS.forEach((a) => {
+    const src = a <= 65 ? muted || body : body || muted;
+    if (src) lines.push(`.${esc(`text-white/${a}`)}{color:${rgbaOf(src, a / 100)} !important}`);
+  });
+  if (heading) {
+    lines.push(`h1,h2,h3,h4,.font-display{color:${heading} !important}`);
+    lines.push(`h1,h2,h3,h4{-webkit-text-fill-color:${heading} !important}`);
+  }
+  if (lh !== null) lines.push(`body,p,li{line-height:${lh} !important}`);
+  if (tr !== null) lines.push(`h1,h2,h3{letter-spacing:${tr}px !important}`);
+  return lines.join("\n");
+};
+
+/* ---------------------------------------------------------------- animations
+ * A plain CSS `animation` on `transform` would fight the x/y/rotate/scale
+ * overrides, so we generate a DEDICATED keyframe set per element with that
+ * element's own base transform baked into every step. Hover keeps winning
+ * because `!important` declarations beat animations.
+ */
+export const ANIMS = {
+  fade: { label: "Απαλή εμφάνιση", from: {} },
+  up: { label: "Ανεβαίνει", from: { ty: 1 } },
+  down: { label: "Κατεβαίνει", from: { ty: -1 } },
+  left: { label: "Από αριστερά", from: { tx: -1 } },
+  right: { label: "Από δεξιά", from: { tx: 1 } },
+  zoomIn: { label: "Μεγαλώνει", from: { sc: -0.18 } },
+  zoomOut: { label: "Μικραίνει", from: { sc: 0.18 } },
+  blurIn: { label: "Ξεθολώνει", from: { blur: 1 } },
+  flip: { label: "Γυρίζει (flip)", from: { ry: 1 } },
+  rotateIn: { label: "Στριφογυρίζει", from: { rot: 1 } },
+  pop: { label: "Πετάγεται (pop)", pop: true },
+  riseBlur: { label: "Ανεβαίνει & ξεθολώνει", from: { ty: 1, blur: 1 } },
+  float: { label: "Αιωρείται (συνεχές)", loop: "float" },
+  pulse: { label: "Παλμός (συνεχές)", loop: "pulse" },
+  sway: { label: "Λικνίζεται (συνεχές)", loop: "sway" },
+  breathe: { label: "Ανασαίνει (συνεχές)", loop: "breathe" },
+  glowLoop: { label: "Λάμπει (συνεχές)", loop: "glow" },
+  spin: { label: "Περιστρέφεται (συνεχές)", loop: "spin" },
+};
+
+const EASES = {
+  smooth: "cubic-bezier(.2,.7,.2,1)",
+  linear: "linear",
+  in: "cubic-bezier(.4,0,1,1)",
+  out: "cubic-bezier(0,0,.2,1)",
+  spring: "cubic-bezier(.34,1.56,.64,1)",
+};
+
+const hashName = (s) => {
+  let h = 5381;
+  for (let i = 0; i < s.length; i += 1) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0;
+  return `sg-a-${h.toString(36)}`;
+};
+
+/** The element's resting visuals, so every keyframe can end exactly there. */
+const restOf = (s) => {
+  const tr = transformList(s).join(" ");
+  const op = num(s.opacity);
+  const filters = [];
+  if (num(s.blur)) filters.push(`blur(${num(s.blur)}px)`);
+  if (num(s.grayscale)) filters.push(`grayscale(${num(s.grayscale)}%)`);
+  if (num(s.brightness) !== null && num(s.brightness) !== 100) filters.push(`brightness(${num(s.brightness)}%)`);
+  if (num(s.saturate) !== null && num(s.saturate) !== 100) filters.push(`saturate(${num(s.saturate)}%)`);
+  return {
+    transform: tr || "none",
+    opacity: op === null || op === 100 ? "1" : String(op / 100),
+    filter: filters.length ? filters.join(" ") : "none",
+  };
+};
+
+const withBase = (base, extra) => [base === "none" ? "" : base, extra].filter(Boolean).join(" ") || "none";
+
+/** Returns { name, css } for one element/device, or null when no animation. */
+export const animationFor = (path, dev, s) => {
+  const def = ANIMS[s?.anim];
+  if (!def) return null;
+  const name = hashName(`${path}|${dev}|${s.anim}|${s.animDist}|${s.animOpacity}`);
+  const rest = restOf(s);
+  const dist = num(s.animDist) === null ? 26 : num(s.animDist);
+  const startOp = s.animOpacity === false ? rest.opacity : "0";
+  let css = "";
+
+  if (def.loop) {
+    const half = {
+      float: `transform:${withBase(rest.transform, `translateY(${-dist}px)`)}`,
+      pulse: `transform:${withBase(rest.transform, `scale(${1 + Math.abs(dist) / 100})`)}`,
+      sway: `transform:${withBase(rest.transform, `rotate(${Math.max(1, Math.abs(dist) / 6)}deg)`)}`,
+      breathe: `opacity:${Math.max(0.15, 1 - Math.abs(dist) / 60)}`,
+      glow: `box-shadow:0 0 ${Math.max(8, Math.abs(dist))}px ${s.animColor || "rgba(96,214,255,.6)"}`,
+    }[def.loop];
+    if (def.loop === "spin") {
+      css = `@keyframes ${name}{from{transform:${rest.transform}}to{transform:${withBase(rest.transform, "rotate(360deg)")}}}`;
+    } else {
+      const at0 = def.loop === "breathe" ? `opacity:${rest.opacity}` : def.loop === "glow" ? "box-shadow:0 0 0 rgba(0,0,0,0)" : `transform:${rest.transform}`;
+      css = `@keyframes ${name}{0%,100%{${at0}}50%{${half}}}`;
+    }
+  } else if (def.pop) {
+    css =
+      `@keyframes ${name}{` +
+      `0%{opacity:${startOp};transform:${withBase(rest.transform, "scale(.62)")}}` +
+      `62%{opacity:${rest.opacity};transform:${withBase(rest.transform, "scale(1.07)")}}` +
+      `100%{opacity:${rest.opacity};transform:${rest.transform}}}`;
+  } else {
+    const f = def.from || {};
+    const extra = [];
+    if (f.tx) extra.push(`translateX(${f.tx * dist}px)`);
+    if (f.ty) extra.push(`translateY(${f.ty * dist}px)`);
+    if (f.sc) extra.push(`scale(${1 + f.sc})`);
+    if (f.ry) extra.push(`rotateY(${Math.max(30, Math.abs(dist) * 2)}deg)`);
+    if (f.rot) extra.push(`rotate(${-Math.max(4, Math.abs(dist) / 3)}deg)`);
+    const fromFilter = f.blur ? `filter:blur(${Math.max(3, Math.abs(dist) / 2)}px);` : "";
+    const persp = f.ry ? "perspective(900px) " : "";
+    css =
+      `@keyframes ${name}{` +
+      `from{opacity:${startOp};${fromFilter}transform:${withBase(rest.transform, persp + extra.join(" "))}}` +
+      `to{opacity:${rest.opacity};filter:${rest.filter};transform:${rest.transform}}}`;
+  }
+
+  const dur = num(s.animDur) === null ? 700 : num(s.animDur);
+  const delay = num(s.animDelay) || 0;
+  const ease = EASES[s.animEase] || EASES.smooth;
+  const loop = def.loop ? "infinite" : "1";
+  const paused = s.animTrigger === "load" ? "" : " paused";
+  const decl = `animation:${name} ${dur}ms ${ease} ${delay}ms ${loop} both${paused} !important`;
+
+  return { name, keyframes: css, decl, viewTriggered: s.animTrigger !== "load" };
+};
 const esc = (sel) => sel.replace(/[/.[\]]/g, (m) => `\\${m}`);
 
 const INK_ALPHAS = [5, 8, 10, 12, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90];
@@ -310,28 +461,41 @@ export const DEVICE_KEYS = ["d", "t", "m"];
 const MEDIA = { t: "@media (max-width:1023px)", m: "@media (max-width:767px)" };
 
 export const StyleOverrides = ({ styles, theme }) => {
-  const css = useMemo(() => {
+  const built = useMemo(() => {
     const buckets = { d: [], t: [], m: [] };
+    const keyframes = [];
+    const watch = [];
 
     Object.entries(styles || {}).forEach(([path, cfg]) => {
       if (!cfg || typeof cfg !== "object") return;
-      const sel = `[data-sg="${String(path).replace(/["\\]/g, "")}"]`;
+      const clean = String(path).replace(/["\\]/g, "");
+      const sel = `[data-sg="${clean}"]`;
 
       DEVICE_KEYS.forEach((dev) => {
         const conf = cfg[dev];
         if (!conf || typeof conf !== "object") return;
 
-        const base = declarations(conf);
+        const anim = animationFor(clean, dev, conf);
+        const base = declarations(conf, { animated: !!anim });
         const hv = conf.hover;
         const withHover = hasHover(hv);
 
-        if (base || withHover) {
-          const speed = num(hv?.speed);
-          const rules = [base];
-          if (withHover) rules.push(`transition:all ${speed === null ? 220 : speed}ms cubic-bezier(.2,.7,.2,1) !important`);
-          const decl = rules.filter(Boolean).join(";");
-          if (decl) buckets[dev].push(`${sel}{${decl}}`);
+        const rules = [base];
+        if (withHover) {
+          const speed = num(hv.speed);
+          rules.push(`transition:all ${speed === null ? 220 : speed}ms cubic-bezier(.2,.7,.2,1) !important`);
         }
+        if (anim) {
+          rules.push(anim.decl);
+          keyframes.push(anim.keyframes);
+          if (anim.viewTriggered) {
+            buckets[dev].push(`${sel}.sg-in{animation-play-state:running !important}`);
+            if (!watch.includes(clean)) watch.push(clean);
+          }
+        }
+
+        const decl = rules.filter(Boolean).join(";");
+        if (decl) buckets[dev].push(`${sel}{${decl}}`);
 
         if (withHover) {
           const hd = hoverDeclarations(conf, hv);
@@ -342,14 +506,51 @@ export const StyleOverrides = ({ styles, theme }) => {
 
     const parts = [];
     if (theme?.mode === "light") parts.push(lightCss(theme));
+    const tcss = textCss(theme);
+    if (tcss) parts.push(tcss);
+    if (keyframes.length) parts.push(keyframes.join("\n"));
     if (buckets.d.length) parts.push(buckets.d.join("\n"));
     if (buckets.t.length) parts.push(`${MEDIA.t}{${buckets.t.join("")}}`);
     if (buckets.m.length) parts.push(`${MEDIA.m}{${buckets.m.join("")}}`);
-    return parts.join("\n");
+    return { css: parts.join("\n"), watch };
   }, [styles, theme]);
 
-  if (!css) return null;
-  return <style data-sg-styles="1">{css}</style>;
+  /* "μόλις μπει στην οθόνη" trigger: add .sg-in when the element scrolls in */
+  useEffect(() => {
+    const paths = built.watch;
+    if (!paths.length || typeof IntersectionObserver === "undefined") return undefined;
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("sg-in");
+            io.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -6% 0px" }
+    );
+
+    const attach = () => {
+      paths.forEach((p) => {
+        document.querySelectorAll(`[data-sg="${p}"]`).forEach((el) => {
+          el.classList.remove("sg-in"); // replay while editing in the Studio
+          io.observe(el);
+        });
+      });
+    };
+    attach();
+    const late = setTimeout(attach, 350);
+
+    return () => {
+      clearTimeout(late);
+      io.disconnect();
+    };
+  }, [built.watch]);
+
+  if (!built.css) return null;
+  return <style data-sg-styles="1">{built.css}</style>;
 };
 
 export default StyleOverrides;

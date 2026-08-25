@@ -58,6 +58,36 @@ breakpoint objects — `d` (desktop, no media query), `t` (tablet, `@media max-w
 `Studio.setStyle(path, dev, key, value)` accepts `key` as a string **or an array** for nested writes.
 
 ## 3. Implemented
+### Jul 2025 — Carousel polish, global text colours, per-element animations
+- **Carousel** (`Marquee.jsx`, `Clients.js`): direction was hardcoded (`reverse={i % 2 === 1}`) and row speeds
+  came from a hardcoded `ROW_FACTORS`. Now content-driven: `clients.direction` (alternate | left | right |
+  manual) with `clients.rowDirs[]` per-row toggles, `clients.rowVariety` (0 = all rows identical),
+  `clients.hoverSpeed` (idle % on hover instead of a dead stop), `clients.brake` (accel/decel softness) and
+  `clients.drag` (pointer drag + inertia, 6px threshold, pointer capture, click-capture guard so a drag never
+  follows the card's link). Track uses `translate3d` + `willChange`.
+  Drag is suppressed inside the Studio's edit mode via a `data-sg-edit` attribute PreviewBridge puts on `<html>`.
+- **`clients.cardHover`**: lift, scale, 3D tilt, glow + colour, hover border colour, logo grayscale at rest and
+  on hover, and transition speed. Defaults reproduce the previous look exactly.
+- **Global text colours** — `theme.text.{heading,body,muted,lineHeight,headingTracking}`. The site paints text
+  with Tailwind white/alpha utilities and only the LIGHT theme used to remap them; `textCss()` now remaps them
+  in **any** theme mode (alphas <= 65 follow `muted`, higher ones follow `body`) and overrides
+  `-webkit-text-fill-color` so even the gradient hero word obeys. Emitted before the per-element rules, so a
+  single element's own colour still wins.
+- **Per-element animations** — `anim, animTrigger, animDur, animDelay, animDist, animEase, animColor,
+  animOpacity` per device. A plain CSS `animation` on `transform` would have destroyed the x/y/rotate/scale
+  overrides, so `animationFor()` generates a **dedicated `@keyframes` set per element+device with that
+  element's resting transform / opacity / filter baked into every step**, and `declarations(s, {animated:true})`
+  skips emitting those three so no `!important` can block the animation. Hover still wins because `!important`
+  declarations beat animations. 19 types (fade, up, down, left, right, zoomIn, zoomOut, blurIn, flip, rotateIn,
+  pop, riseBlur + continuous float, pulse, sway, breathe, glowLoop, spin). `animTrigger=view` emits the rule
+  `paused` plus a `[data-sg=x].sg-in{animation-play-state:running}` companion, driven by an IntersectionObserver
+  inside `StyleOverrides` that clears `.sg-in` on each run so the animation replays while editing.
+- **`theme.motion`** toggle wraps PublicSite in framer-motion's `<MotionConfig reducedMotion>` so the owner can
+  switch the site's built-in entrance motion off and keep only their own animations.
+- All of it verified by the testing agent with measured values, including the card hover
+  (`grayscale(1)`->`grayscale(0)`, `rotateX(8deg) translateY(-14px) scale(1.08)`, `0px 0px 40px` glow) and the
+  drag (-240px gesture, inertia glide, blocked in edit mode, link not followed).
+
 ### Jul 2025 — Studio becomes "editable στα πάντα" + bug sweep
 - **New 3rd breakpoint:** tablet is now styleable (`t`). Previously the Studio previewed tablet at 820px but
   styles only existed for `d`/`m` with mobile at max-width:767px, so tablet was unreachable. The style editor
