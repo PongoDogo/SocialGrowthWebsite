@@ -4,8 +4,9 @@ import { Toaster } from "sonner";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import PublicSite from "@/PublicSite";
 
-const ADMIN_ONLY = process.env.REACT_APP_ADMIN_ONLY === "true";
-const STUDIO_PATH = (process.env.REACT_APP_STUDIO_PATH || "studio").replace(/^\/+/, "");
+const ADMIN_HOST = "socialstartup-admin.socialagency.workers.dev";
+const IS_PREVIEW = new URLSearchParams(window.location.search).has("__sgpreview");
+const ADMIN_ONLY = window.location.hostname === ADMIN_HOST && !IS_PREVIEW;
 const AdminStudio = React.lazy(() => import("@/studio/Studio"));
 
 const StudioLoading = () => (
